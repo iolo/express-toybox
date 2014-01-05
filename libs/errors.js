@@ -3,7 +3,7 @@
 var
   util = require('util'),
   _ = require('lodash'),
-  errors = require('../libs/errors'),
+  errors = require('node-toybox').errors,
   CustomError = errors.CustomError,
   StatusCode = { // see http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     OK: 200,

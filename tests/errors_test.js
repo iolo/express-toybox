@@ -1,7 +1,7 @@
 'use strict';
 
 var
-  errors = require('../../libs/errors'),
+  errors = require('../libs/errors'),
   debug = require('debug')('test');
 
 module.exports = {
