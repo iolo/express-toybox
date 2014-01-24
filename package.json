@@ -1,32 +1,32 @@
 {
-  "name": "express-toybox",
-  "version": "0.0.1",
-  "description": "My Own Extra Stuff for Express",
-  "author": "Dongsu Jang <iolothebard@gmail.com>",
-  "repository": {
-    "type": "git",
-    "url": "git://git@github.com/iolo/express-toybox.git"
-  },
-  "license": "MIT",
-  "engines": {
-    "node": "~0.10"
-  },
-  "dependencies": {
-    "q": "latest",
-    "lodash": "latest",
-    "express": "latest",
-    "debug": "latest",
-    "node-toybox": "latest"
-  },
-  "devDependencies": {
-    "nodeunit": "latest",
-    "supertest": "latest",
-    "grunt": "latest",
-    "grunt-contrib-jshint": "latest",
-    "grunt-contrib-nodeunit": "latest"
-  },
-  "directories": {
-    "lib": "./libs"
-  },
-  "main": "./libs/index"
+    "name": "express-toybox",
+    "version": "0.0.1",
+    "description": "My Own Extra Stuff for Express",
+    "author": "Dongsu Jang <iolothebard@gmail.com>",
+    "repository": {
+        "type": "git",
+        "url": "git://git@github.com/iolo/express-toybox.git"
+    },
+    "license": "MIT",
+    "engines": {
+        "node": "~0.10"
+    },
+    "dependencies": {
+        "q": "latest",
+        "lodash": "latest",
+        "express": "latest",
+        "debug": "latest",
+        "node-toybox": "latest"
+    },
+    "devDependencies": {
+        "nodeunit": "latest",
+        "supertest": "latest",
+        "grunt": "latest",
+        "grunt-contrib-jshint": "latest",
+        "grunt-contrib-nodeunit": "latest"
+    },
+    "directories": {
+        "lib": "./libs"
+    },
+    "main": "./index"
 }
