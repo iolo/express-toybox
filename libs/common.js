@@ -8,37 +8,77 @@ var
     logger = require('./logger'),
     session = require('./session'),
     cors = require('./cors'),
+    multipart = require('./multipart'),
     error404 = require('./error404'),
     error500 = require('./error500'),
     debug = require('debug')('express-toybox:common'),
     DEBUG = debug.enabled;
 
+/**
+ * setup common express/connect middlewares including logger, session, cors, ...
+ *
+ * NOTE: this should be called before your middlewares and routes.
+ *
+ * @param {*} app express application instance
+ * @param {*} config
+ * @return {*} app
+ */
 function configureMiddlewares(app, config) {
+    // setup request helpers
     utils.extendHttpRequest();
+
+    //
+    // order is meaningful for some express middlewares
+    //
 
     // NOTE: this should be the first middleware
     if (config.logger && !config.logger.disabled) {
         app.use(logger(config.logger));
     }
 
+    // NOTE: this should be placed "high" within middleware stack
+    if (config.compress) {
+        app.use(express.compress());
+    }
+
+    // NOTE: this should be before "cookieSession" middleware
     if (config.cookieParser && !config.cookieParser.disabled) {
         app.use(express.cookieParser(config.cookieParser));
     }
 
-    if (config.bodyParser && !config.bodyParser.disabled) {
-        app.use(express.bodyParser(config.bodyParser));
+    // "_method" body param or "x-http-method-override' header
+    if (config.methodOverride) {
+        app.use(express.methodOverride(config.methodOverride));
     }
 
-    //app.use(express.methodOverride());
-
-    // allow cors request
+    // "cors" request
     if (config.cors && !config.cors.disabled) {
         app.use(cors(config.cors));
     }
 
-    // NOTE: this should be prior to passport middlewares
+    // NOTE: this should be before "passport" middlewares
     if (config.session && !config.session.disabled) {
         app.use(session(config.session));
+    }
+
+    // this should be after "session" middleware
+    if (config.csrf) {
+        app.use(express.csrf());
+    }
+
+    // application/json
+    if (config.json) {
+        app.use(express.json(config.json));
+    }
+
+    // application/x-www-form-urlencoded
+    if (config.urlencoded) {
+        app.use(express.urlencoded(config.urlencoded));
+    }
+
+    // multipart/form-data
+    if (config.multipart) {
+        app.use(multipart(config.multipart));
     }
 
     if (config.root) {
@@ -55,8 +95,19 @@ function configureMiddlewares(app, config) {
             app.use(urlPrefix, express.static(docRoot));
         });
     }
+
+    return app;
 }
 
+/**
+ * setup common express/connect routes including 404, 500 and errorHandler.
+ *
+ * NOTE: this should be called after your middlewares and routes.
+ *
+ * @param {*} app express application instance
+ * @param {*} config
+ * @return {*} app
+ */
 function configureRoutes(app, config) {
     DEBUG && debug('configure error routes', config.errors);
     if (config.errors) {
@@ -68,10 +119,12 @@ function configureRoutes(app, config) {
         if (config500) {
             app.use(error500(config500));
         }
-    } else {
-        console.warn('**fallback** use default error route');
-        app.use(express.errorHandler({dumpException: true, showStack: true}));
     }
+
+    // NOTE: this should be end-of-middleware chain
+    app.use(express.errorHandler({dumpException: true, showStack: true}));
+
+    return app;
 }
 
 module.exports = {

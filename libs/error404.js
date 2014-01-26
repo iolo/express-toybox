@@ -1,10 +1,7 @@
 'use strict';
 
 var
-    util = require('util'),
-    path = require('path'),
     _ = require('lodash'),
-    Q = require('q'),
     express = require('express'),
     errors = require('./errors'),
     debug = require('debug')('express-toybox:error404'),
