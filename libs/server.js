@@ -9,8 +9,8 @@ var
 var
     httpServer,
     DEF_CONFIG = {
-        port: 3000,
-        host: 'localhost'
+        host: 'localhost',
+        port: 3000
     };
 
 /**
@@ -30,7 +30,7 @@ function start(app, config, callback) {
         return httpServer;
     }
 
-    config = _.merge({}, config, DEF_CONFIG);
+    config = _.merge({}, DEF_CONFIG, config);
 
     DEBUG && debug('start http server http://' + config.host + ':' + config.port);
     httpServer = http.createServer(app).listen(config.port, config.host, callback);

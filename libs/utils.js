@@ -90,7 +90,7 @@ function collectQueryParams(req, paramNames) {
 }
 
 function collectDeviceParams(req) {
-    return _.merge({}, req.param('device'), {uuid: req.ip, model: req.headers['user-agent']});
+    return _.merge({}, {uuid: req.ip, model: req.headers['user-agent']}, req.param('device'));
 }
 
 // TODO: ...

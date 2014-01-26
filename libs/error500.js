@@ -8,6 +8,12 @@ var
     debug = require('debug')('express-toybox:error500'),
     DEBUG = debug.enabled;
 
+var
+    DEF_CONFIG = {
+        view: 'errors/500',
+        mappings: {}
+    };
+
 /**
  * express uncaught error handler.
  *
@@ -18,7 +24,7 @@ var
  * @returns {Function} express error handler
  */
 function error500(options) {
-    options = _.merge({view: 'errors/500', mappings: {}}, options);
+    options = _.merge({}, DEF_CONFIG, options);
 
     return function (err, req, res, next) {
         console.error('uncaught express error:', err);

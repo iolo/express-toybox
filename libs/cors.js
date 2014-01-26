@@ -7,6 +7,14 @@ var
     debug = require('debug')('express-toybox:cors'),
     DEBUG = debug.enabled;
 
+var
+    DEF_CONFIG = {
+        origin: '*',
+        methods: 'GET,PUT,POST,DELETE',
+        headers: 'Accept,Authorization,Content-Type,Origin,Referer,User-Agent,X-Requested-With',
+        credentials: false,
+        maxAge: 24 * 60 * 60
+    };
 
 /**
  * CORS middleware.
@@ -21,13 +29,7 @@ var
  * @see https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
  */
 function cors(options) {
-    options = _.merge({}, {
-        origin: '*',
-        methods: 'GET,PUT,POST,DELETE',
-        headers: 'Accept,Authorization,Content-Type,Origin,Referer,User-Agent,X-Requested-With',
-        credentials: false,
-        maxAge: 24 * 60 * 60
-    }, options);
+    options = _.merge({}, DEF_CONFIG, options);
     DEBUG && debug('configure http cors middleware', options);
     return function (req, res, next) {
         if (req.headers.origin) {
