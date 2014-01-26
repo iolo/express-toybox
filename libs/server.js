@@ -40,7 +40,9 @@ function start(app, config, callback) {
         httpServer = null;
     });
 
-    process.on('exit', stop);
+    process.on('exit', function () {
+      stop();
+    });
 
     if (process.env.NODE_ENV === 'production') {
         process.on('uncaughtException', function (err) {
