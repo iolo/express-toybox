@@ -28,6 +28,7 @@ function error500(options) {
 
     return function (err, req, res, next) {
         console.error('uncaught express error:', err);
+        DEBUG && debug(err.stack);
 
         // TODO: error mappings by err.name, err.code, ...
         var error = {
