@@ -3,6 +3,7 @@
 var
     formidable = require('formidable'),
     express = require('express'),
+    //FS = require('q-io/fs'),
     errors = require('./errors'),
     debug = require('debug')('express-toybox:multipart'),
     DEBUG = debug.enabled;
@@ -24,6 +25,23 @@ var
 function multipart(options) {
     options = options || {};
     DEBUG && debug('configure http multipart middleware', options);
+    /*
+    if (options.uploadDir) {
+        FS.isDirectory(options.uploadDir)
+            .then(function (exists) {
+                if (!exists) {
+                    return FS.makeTree(options.uploadDir)
+                      .then(function () {
+                        DEBUG && debug('create upload dir:', options.uploadDir);
+                      })
+                      .fail(function (err) {
+                        console.error('***warning*** invalid upload dir:', options.uploadDir, err);
+                      });
+                }
+            })
+            .done();
+    }
+    */
     return function (req, res, next) {
         if (req._body || !req.is('multipart/form-data') || 'POST' !== req.method) {
             return next();
@@ -43,7 +61,7 @@ function multipart(options) {
             req.files = files;
             return next();
         });
-    }
+    };
 }
 
 module.exports = multipart;
