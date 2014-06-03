@@ -1,7 +1,7 @@
 'use strict';
 
 var
-    formidable = require('formidable'),
+    multiparty = require('multiparty'),
     express = require('express'),
     //FS = require('q-io/fs'),
     errors = require('./errors'),
@@ -9,17 +9,21 @@ var
     DEBUG = debug.enabled;
 
 /**
- * multipart middleware using formidable.
+ * multipart middleware using "multiparty".
  *
  * @param {*} [options]
- * @param {String} [encoding='UTF-8']
+ * @param {String} [encoding='utf8']
  * @param {String} [uploadDir=os.tmpdir()]
  * @param {String} [keepExtensions=false]
  * @param {Number} [maxFields=2*1024*1024]
  * @param {Number} [maxFieldsSize=1000]
+ * @param {Number} [maxFilesSize=Infinity]
  * @param {String} [hash=false] 'sha1' or 'md5'
+ * @param {boolean} [autoFields]
+ * @param {boolean} [autoFiles]
+
  * @returns {Function} connect/express middleware function
- * @see https://github.com/felixge/node-formidable
+ * @see https://github.com/andrewrk/node-multiparty
  */
 
 function multipart(options) {
@@ -48,8 +52,8 @@ function multipart(options) {
         }
 
         DEBUG && debug('got multipart request', req.path);
-        req.form = new formidable.IncomingForm(options);
-        req.form.parse(req, function (err, fields, files) {
+        req.form = new multiparty.Form(options);
+        req.form.parse(req, function(err, fields, files) {
             if (err) {
                 DEBUG && debug('err', err);
                 return next(err);

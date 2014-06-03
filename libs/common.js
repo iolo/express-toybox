@@ -5,10 +5,6 @@ var
     express = require('express'),
     errors = require('./errors'),
     utils = require('./utils'),
-    logger = require('./logger'),
-    session = require('./session'),
-    cors = require('./cors'),
-    multipart = require('./multipart'),
     error404 = require('./error404'),
     error500 = require('./error500'),
     debug = require('debug')('express-toybox:common'),
@@ -24,6 +20,8 @@ var
  * @return {*} app
  */
 function configureMiddlewares(app, config) {
+    config = config || {};
+
     // setup request helpers
     utils.extendHttpRequest();
 
@@ -33,66 +31,66 @@ function configureMiddlewares(app, config) {
 
     // NOTE: this should be the first middleware
     if (config.logger && !config.logger.disabled) {
-        app.use(logger(config.logger));
+        app.use(require('./logger')(config.logger));
     }
 
     // NOTE: this should be placed "high" within middleware stack
-    if (config.compress) {
-        app.use(express.compress());
+    if (config.compress || config.compression) {
+        app.use(require('compression')(config.compress || config.compression));
     }
 
-    // NOTE: this should be before "cookieSession" middleware
+    // NOTE: this should be before "session" middleware using "cookie store"
     if (config.cookieParser && !config.cookieParser.disabled) {
-        app.use(express.cookieParser(config.cookieParser));
+        app.use(require('cookie-parser')(config.cookieParser));
     }
 
     // "_method" body param or "x-http-method-override' header
     if (config.methodOverride) {
-        app.use(express.methodOverride(config.methodOverride));
+        app.use(require('method-override')(config.methodOverride));
     }
 
     // "cors" request
     if (config.cors && !config.cors.disabled) {
-        app.use(cors(config.cors));
+        app.use(require('./cors')(config.cors));
     }
 
     // NOTE: this should be before "passport" middlewares
     if (config.session && !config.session.disabled) {
-        app.use(session(config.session));
+        app.use(require('./session')(config.session));
     }
 
     // this should be after "session" middleware
-    if (config.csrf) {
-        app.use(express.csrf());
+    if (config.csrf || config.csurf) {
+        app.use(require('csurf')(config.csrf || config.csurf));
     }
 
     // application/json
     if (config.json) {
-        app.use(express.json(config.json));
+        app.use(require('body-parser').json(config.json));
     }
 
     // application/x-www-form-urlencoded
     if (config.urlencoded) {
-        app.use(express.urlencoded(config.urlencoded));
+        app.use(require('body-parser').urlencoded(config.urlencoded));
     }
 
     // multipart/form-data
     if (config.multipart) {
-        app.use(multipart(config.multipart));
+        app.use(require('./multipart')(config.multipart));
     }
 
     if (config.root) {
         var root = path.resolve(process.cwd(), config.root);
         DEBUG && debug('configure http static root:', root);
-        app.use(express.favicon(path.join(root, 'favicon.ico')));
-        app.use(express.static(root));
+        app.use(require('serve-favicon')(path.join(root, 'favicon.ico')));
+        app.use(require('serve-static')(root));
     }
 
     if (config.statics) {
         Object.keys(config.statics).forEach(function (urlPrefix) {
             var docRoot = path.resolve(process.cwd(), config.statics[urlPrefix]);
             DEBUG && debug('configure http static route: ', urlPrefix, '--->', docRoot);
-            app.use(urlPrefix, express.static(docRoot));
+            app.use(urlPrefix, require('serve-static')(docRoot));
         });
     }
 
@@ -109,6 +107,8 @@ function configureMiddlewares(app, config) {
  * @return {*} app
  */
 function configureRoutes(app, config) {
+    config = config || {};
+
     DEBUG && debug('configure error routes', config.errors);
     if (config.errors) {
         var config404 = config.errors['404'];
@@ -122,7 +122,7 @@ function configureRoutes(app, config) {
     }
 
     // NOTE: this should be end-of-middleware chain
-    app.use(express.errorHandler({dumpException: true, showStack: true}));
+    app.use(require('errorhandler')({dumpException: true, showStack: true}));
 
     return app;
 }

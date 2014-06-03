@@ -2,6 +2,7 @@
 
 var
     fs = require('fs'),
+    path = require('path'),
     superagent = require('superagent'),
     express = require('express'),
     multipart = require('../libs/multipart'),
@@ -27,15 +28,26 @@ module.exports = {
             test.ok(req.files);
             test.ok(req.body);
 
-            var foo = req.files.foo;
+            test.ok(req.files);
+            test.ok(req.files instanceof Object);
+            test.ok(req.files.foo);
+            test.ok(req.files.foo instanceof Array);
+            test.equal(req.files.foo.length, 1);
+            test.ok(req.files.bar);
+            test.ok(req.files.bar instanceof Array);
+            test.equal(req.files.bar.length, 1);
+
+            var foo = req.files.foo[0];
             test.ok(foo);
-            test.equal(foo.name, 'foo.txt');
+            test.equal(foo.fieldName, 'foo');
+            test.equal(foo.originalFilename, 'foo.txt');
             test.equal(foo.size, 3);
             test.equal(fs.readFileSync(foo.path, 'utf8'), 'FOO');
 
-            var bar = req.files.bar;
+            var bar = req.files.bar[0];
             test.ok(bar);
-            test.equal(bar.name, 'bar.txt');
+            test.equal(bar.fieldName, 'bar');
+            test.equal(bar.originalFilename, 'bar.txt');
             test.equal(bar.size, 3);
             test.equal(fs.readFileSync(bar.path, 'utf8'), 'BAR');
 
@@ -48,26 +60,10 @@ module.exports = {
         });
 
         var req = superagent.agent().post('http://localhost:3000/test');
-        req.part()
-            .set('Content-Disposition', 'form-data; name="foo"; filename="foo.txt"')
-            .set('Content-Type', 'text/plain')
-            .set('Content-Transfer-Encoding', 'binary')
-            .write('FOO');
-
-        req.part()
-            .set('Content-Disposition', 'form-data; name="bar"; filename="bar.txt"')
-            .set('Content-Type', 'text/plain')
-            .set('Content-Transfer-Encoding', 'binary')
-            .write('BAR');
-
-        req.part()
-            .set('Content-Disposition', 'form-data; name="baz"')
-            .write('BAZ');
-
-        req.part()
-            .set('Content-Disposition', 'form-data; name="qux"')
-            .write('QUX');
-
+        req.attach('foo', path.join(__dirname, '/foo.txt'), 'foo.txt');
+        req.attach('bar', path.join(__dirname, '/bar.txt'), 'bar.txt');
+        req.field('baz', 'BAZ');
+        req.field('qux', 'QUX');
         req.end(function (err, res) {
             debug('***error', err);
             //debug('***request', req);

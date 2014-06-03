@@ -8,7 +8,7 @@ var
     DEBUG = debug.enabled;
 
 /**
- * logger middleware.
+ * logger middleware using "morgan".
  *
  * @param {*} options
  * @param {*} [options.stream]
@@ -24,14 +24,14 @@ function logger(options) {
             var loggerFile = path.resolve(process.cwd(), options.stream.file || options.stream);
             // replace stream options with stream object
             options.stream = require('fs').createWriteStream(loggerFile, {flags: 'a'});
-            return express.logger(options);
+            return require('morgan')(options);
         } catch (e) {
             console.error('failed to configure http logger stream', e);
             //process.exit(1);
         }
     }
     console.warn('**fallback** use default logger middleware');
-    return express.logger(options);
+    return require('morgan')(options);
 }
 
 module.exports = logger;

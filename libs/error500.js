@@ -34,7 +34,8 @@ function error500(options) {
         var error = {
             status: err.status || options.mappings[err.name] || 500,
             code: err.code || 0,
-            message: err.message || String(err)
+            message: err.message || String(err),
+            cause: err.cause
         };
         if (options.stack) {
             error.stack = (err.stack && err.stack.split('\n')) || [];
@@ -42,7 +43,7 @@ function error500(options) {
 
         res.status(error.status);
 
-        switch (req.accepts('html,json')) {
+        switch (req.accepts('html', 'json')) {
             case 'html':
                 return res.render(options.view, {error: error});
             case 'json':
