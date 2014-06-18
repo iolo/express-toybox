@@ -43,11 +43,11 @@ function error500(options) {
 
         res.status(error.status);
 
-        switch (req.accepts('html', 'json')) {
-            case 'html':
-                return res.render(options.view, {error: error});
+        switch (req.accepts(['json', 'html'])) {
             case 'json':
                 return res.json(error);
+            case 'html':
+                return res.render(options.view, {error: error});
         }
         return res.send(util.inspect(error));
     };

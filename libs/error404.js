@@ -11,7 +11,7 @@ var
     DEF_CONFIG = {
         view: 'errors/404',
         code: 8404,
-        method: 'Not Found'
+        message: 'Not Found'
     };
 
 /**
@@ -27,13 +27,16 @@ function error404(options) {
     options = _.merge({}, DEF_CONFIG, options);
 
     return function (req, res, next) {
+
+        var error = {status: 404, code: options.code, message: options.message};
+
         res.status(404);
 
-        switch (req.accepts('html,json')) {
-            case 'html':
-                return res.render(options.view);
+        switch (req.accepts(['json', 'html'])) {
             case 'json':
-                return res.json({status: 404, code: options.code, message: options.message});
+                return res.json(error);
+            case 'html':
+                return res.render(options.view, {error: error});
         }
         return res.send(options.message);
     };

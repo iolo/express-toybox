@@ -5,7 +5,7 @@ var
     path = require('path'),
     superagent = require('superagent'),
     express = require('express'),
-    common = require('../libs/common'),
+    error404 = require('../libs/error404'),
     debug = require('debug')('test');
 
 module.exports = {
@@ -17,16 +17,16 @@ module.exports = {
         this.server.close();
         callback();
     },
-    test_statics: function (test) {
-        common.configureMiddlewares(this.app, {statics: {'/test': __dirname}});
+    test_error404: function (test) {
+        this.app.use(error404());
 
-        var req = superagent.agent().get('http://localhost:3000/test/foo.txt');
+        var req = superagent.agent().get('http://localhost:3000/404');
+        req.set('Accept', 'application/json')
         req.end(function (err, res) {
             debug('***error', err);
             //debug('***request', req);
-            //debug('***response', res);
-            test.equal(res.status, 200);
-            test.equal(res.text, 'FOO');
+            debug('***response', res.body);
+            test.equal(res.status, 404);
             test.done();
         });
     }
