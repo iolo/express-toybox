@@ -249,46 +249,49 @@ function extendHttpResponse() {
     var res = express.response || require('http').ServerResponse.prototype;
 
     res.sendLater = function (promise) {
+        var res = this;
         Q.when(promise).then(function (result) {
             res.send(result);
         }).done();
     };
 
     res.jsonLater = function (promise) {
+        var res = this;
         Q.when(promise).then(function (result) {
             res.json(result);
         }).done();
     };
 
     res.jsonpLater = function (promise) {
+        var res = this;
         Q.when(promise).then(function (result) {
             res.send(result);
         }).done();
     };
 
     res.sendFileLater = function (promise) {
+        var res = this;
         Q.when(promise).then(function (result) {
             res.sendFile(result);
         }).done();
     };
 
     res.sendFileLater = function (promise) {
+        var res = this;
         Q.when(promise).then(function (result) {
             res.sendFile(result);
         }).done();
     };
 
     res.redirectLater = function (promise) {
+        var res = this;
         Q.when(promise).then(function (result) {
             res.redirect(result);
         }).done();
     };
 
-    res.renderLater = function (view, locals, promise) {
-        if (arguments.length == 2) {
-            locals = {};
-            promise = locals;
-        }
+    res.renderLater = function (promise, view, locals) {
+        var res = this;
         Q.when(promise).then(function (result) {
             res.render(view, locals);
         }).done();
