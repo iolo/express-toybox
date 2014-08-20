@@ -18,7 +18,20 @@ module.exports = {
         callback();
     },
     test_statics: function (test) {
-        common.configureMiddlewares(this.app, {statics: {'/test': __dirname}});
+        common.configureMiddlewares(this.app, {logger: 'combined', statics: {'/test': __dirname}});
+
+        var req = superagent.agent().get('http://localhost:3000/test/foo.txt');
+        req.end(function (err, res) {
+            debug('***error', err);
+            //debug('***request', req);
+            //debug('***response', res);
+            test.equal(res.status, 200);
+            test.equal(res.text, 'FOO');
+            test.done();
+        });
+    },
+    test_statics2: function (test) {
+        this.app.useCommonMiddlewares({logger: 'combined', statics: {'/test': __dirname}});
 
         var req = superagent.agent().get('http://localhost:3000/test/foo.txt');
         req.end(function (err, res) {

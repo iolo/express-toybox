@@ -56,7 +56,7 @@ module.exports = {
             test.equal(req.body.qux, 'QUX');
             test.equal(req.param('qux'), 'QUX');
 
-            res.send(200);
+            res.status(200).end();
         });
 
         var req = superagent.agent().post('http://localhost:3000/test');

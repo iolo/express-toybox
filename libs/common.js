@@ -25,12 +25,15 @@ function configureMiddlewares(app, config) {
     // setup request helpers
     utils.extendHttpRequest();
 
+    // setup response helpers
+    utils.extendHttpResponse();
+
     //
     // order is meaningful for some express middlewares
     //
 
     // NOTE: this should be the first middleware
-    if (config.logger && !config.logger.disabled) {
+    if (config.logger) {
         app.use(require('./logger')(config.logger));
     }
 
@@ -40,7 +43,7 @@ function configureMiddlewares(app, config) {
     }
 
     // NOTE: this should be before "session" middleware using "cookie store"
-    if (config.cookieParser && !config.cookieParser.disabled) {
+    if (config.cookieParser) {
         app.use(require('cookie-parser')(config.cookieParser));
     }
 
@@ -50,12 +53,12 @@ function configureMiddlewares(app, config) {
     }
 
     // "cors" request
-    if (config.cors && !config.cors.disabled) {
+    if (config.cors) {
         app.use(require('./cors')(config.cors));
     }
 
     // NOTE: this should be before "passport" middlewares
-    if (config.session && !config.session.disabled) {
+    if (config.session) {
         app.use(require('./session')(config.session));
     }
 
@@ -109,6 +112,10 @@ function configureMiddlewares(app, config) {
 function configureRoutes(app, config) {
     config = config || {};
 
+    // TODO: add declarative routes
+    // 'GET /foo bar:qux' --> get('/foo', require('bar)['qux']) ???
+    // ...
+
     DEBUG && debug('configure error routes', config.errors);
     if (config.errors) {
         var config404 = config.errors['404'];
@@ -125,6 +132,16 @@ function configureRoutes(app, config) {
     app.use(require('errorhandler')({dumpException: true, showStack: true}));
 
     return app;
+}
+
+if (express.application) {
+    express.application.useCommonMiddlewares = function (config) {
+        return configureMiddlewares(this, config);
+    };
+
+    express.application.useCommonRoutes = function (config) {
+        return configureRoutes(this, config);
+    };
 }
 
 module.exports = {

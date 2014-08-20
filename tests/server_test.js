@@ -17,7 +17,7 @@ module.exports = {
     },
     test_get: function (test) {
         this.app.get('/test', function (req, res) {
-            res.send(200);
+            res.status(200).end();
         });
 
         var req = superagent.agent().get('http://localhost:3000/test');

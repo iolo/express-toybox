@@ -142,7 +142,7 @@ function renderViewOrRedirectToNext(req, res, view, next, vm) {
  * add some utility methods to http request.
  */
 function extendHttpRequest() {
-    var req = require('http').IncomingMessage.prototype;
+    var req = express.request || require('http').IncomingMessage.prototype;
 
     /**
      * get string param from http request.
@@ -241,6 +241,59 @@ function extendHttpRequest() {
     };
 }
 
+/**
+ * add some utility methods to http response.
+ */
+function extendHttpResponse() {
+    var res = express.response || require('http').ServerResponse.prototype;
+
+    res.sendLater = function (promise) {
+        Q.when(promise).then(function (result) {
+            res.send(result);
+        }).done();
+    };
+
+    res.jsonLater = function (promise) {
+        Q.when(promise).then(function (result) {
+            res.json(result);
+        }).done();
+    };
+
+    res.jsonpLater = function (promise) {
+        Q.when(promise).then(function (result) {
+            res.send(result);
+        }).done();
+    };
+
+    res.sendFileLater = function (promise) {
+        Q.when(promise).then(function (result) {
+            res.sendFile(result);
+        }).done();
+    };
+
+    res.sendFileLater = function (promise) {
+        Q.when(promise).then(function (result) {
+            res.sendFile(result);
+        }).done();
+    };
+
+    res.redirectLater = function (promise) {
+        Q.when(promise).then(function (result) {
+            res.redirect(result);
+        }).done();
+    };
+
+    res.renderLater = function (view, locals, promise) {
+        if (arguments.length == 2) {
+            locals = {};
+            promise = locals;
+        }
+        Q.when(promise).then(function (result) {
+            res.render(view, locals);
+        }).done();
+    };
+}
+
 module.exports = {
     collectQueryParams: collectQueryParams,
     collectDeviceParams: collectDeviceParams,
@@ -248,5 +301,6 @@ module.exports = {
     validateCaptcha: validateCaptcha,
     pagination: pagination,
     renderViewOrRedirectToNext: renderViewOrRedirectToNext,
-    extendHttpRequest: extendHttpRequest
+    extendHttpRequest: extendHttpRequest,
+    extendHttpResponse: extendHttpResponse
 };
