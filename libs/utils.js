@@ -290,10 +290,10 @@ function extendHttpResponse() {
         }).done();
     };
 
-    res.renderLater = function (promise, view, locals) {
+    res.renderLater = function (view, promise) {
         var res = this;
         Q.when(promise).then(function (result) {
-            res.render(view, locals);
+            res.render(view, result);
         }).done();
     };
 }

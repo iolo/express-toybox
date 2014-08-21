@@ -1,13 +1,14 @@
 'use strict';
 
-module.exports = {
+module.exports = require('express').toybox = {
     errors: require('./errors'),
+    common: require('./common'),
     utils: require('./utils'),
-    server: require('./server'),
+    resource: require('./resource'),
     cors: require('./cors'),
     session: require('./session'),
     logger: require('./logger'),
     error500: require('./error500'),
     error404: require('./error404'),
-    common: require('./common')
+    server: require('./server')
 };

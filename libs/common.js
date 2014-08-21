@@ -134,15 +134,17 @@ function configureRoutes(app, config) {
     return app;
 }
 
-if (express.application) {
-    express.application.useCommonMiddlewares = function (config) {
-        return configureMiddlewares(this, config);
-    };
+//
+// mixin to express proto.
+//
 
-    express.application.useCommonRoutes = function (config) {
-        return configureRoutes(this, config);
-    };
-}
+express.application.useCommonMiddlewares = function (config) {
+    return configureMiddlewares(this, config);
+};
+
+express.application.useCommonRoutes = function (config) {
+    return configureRoutes(this, config);
+};
 
 module.exports = {
     configureMiddlewares: configureMiddlewares,
