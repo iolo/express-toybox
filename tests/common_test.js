@@ -1,46 +1,24 @@
 'use strict';
 
 var
-    fs = require('fs'),
-    path = require('path'),
-    superagent = require('superagent'),
+    supertest = require('supertest'),
     express = require('express'),
     common = require('../libs/common'),
     debug = require('debug')('test');
 
-module.exports = {
-    setUp: function (callback) {
-        this.app = express();
-        this.server = require('http').createServer(this.app).listen(3000, callback);
-    },
-    tearDown: function (callback) {
-        this.server.close();
-        callback();
-    },
-    test_statics: function (test) {
-        common.configureMiddlewares(this.app, {logger: 'combined', statics: {'/test': __dirname}});
-
-        var req = superagent.agent().get('http://localhost:3000/test/foo.txt');
-        req.end(function (err, res) {
-            debug('***error', err);
-            //debug('***request', req);
-            //debug('***response', res);
-            test.equal(res.status, 200);
-            test.equal(res.text, 'FOO');
-            test.done();
-        });
-    },
-    test_statics2: function (test) {
-        this.app.useCommonMiddlewares({logger: 'combined', statics: {'/test': __dirname}});
-
-        var req = superagent.agent().get('http://localhost:3000/test/foo.txt');
-        req.end(function (err, res) {
-            debug('***error', err);
-            //debug('***request', req);
-            //debug('***response', res);
-            test.equal(res.status, 200);
-            test.equal(res.text, 'FOO');
-            test.done();
-        });
-    }
-};
+describe('common middlewares', function () {
+    it('should support configureMiddlewares() function', function (done) {
+        var app = common.configureMiddlewares(express(), {logger: 'combined', statics: {'/test': __dirname}});
+        supertest(app)
+            .get('/test/foo.txt')
+            .expect(200)
+            .expect('FOO', done);
+    });
+    it('should support useCommonMiddlewares() method', function (done) {
+        var app = express().useCommonMiddlewares({logger: 'combined', statics: {'/test': __dirname}});
+        supertest(app)
+            .get('/test/foo.txt')
+            .expect(200)
+            .expect('FOO', done);
+    });
+});

@@ -1,130 +1,123 @@
 'use strict';
 
 var
+    assert = require('assert'),
     errors = require('../libs/errors'),
     debug = require('debug')('test');
 
-module.exports = {
-    test_HttpError: function (test) {
+describe('errors', function () {
+    it('HttpError', function () {
         var e = new errors.HttpError();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof errors.CustomError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.UNKNOWN]);
-        test.equal(e.status, errors.StatusCode.UNKNOWN);
-        test.equal(e.code, 8599);
-        test.done();
-    },
-    test_ClientError: function (test) {
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof errors.CustomError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.UNKNOWN]);
+        assert.equal(e.status, errors.StatusCode.UNKNOWN);
+        assert.equal(e.code, 8599);
+    });
+    it('ClientError', function () {
         var e = new errors.ClientError();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.ClientError);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.CLIENT_ERROR]);
-        test.equal(e.status, errors.StatusCode.CLIENT_ERROR);
-        test.equal(e.code, 8400);
-        test.done();
-    },
-    test_BadRequest: function (test) {
+        assert.ok(e instanceof errors.ClientError);
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.CLIENT_ERROR]);
+        assert.equal(e.status, errors.StatusCode.CLIENT_ERROR);
+        assert.equal(e.code, 8400);
+    });
+    it('BadRequest', function () {
         var e = new errors.BadRequest();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.ClientError);
-        test.ok(e instanceof errors.BadRequest);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.BAD_REQUEST]);
-        test.equal(e.status, errors.StatusCode.BAD_REQUEST);
-        test.equal(e.code, 8400);
-        test.done();
-    },
-    test_Unauthorized: function (test) {
+        assert.ok(e instanceof errors.ClientError);
+        assert.ok(e instanceof errors.BadRequest);
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.BAD_REQUEST]);
+        assert.equal(e.status, errors.StatusCode.BAD_REQUEST);
+        assert.equal(e.code, 8400);
+    });
+    it('Unauthorized', function () {
         var e = new errors.Unauthorized();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.Unauthorized);
-        test.ok(e instanceof errors.ClientError);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof errors.CustomError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.UNAUTHORIZED]);
-        test.equal(e.status, errors.StatusCode.UNAUTHORIZED);
-        test.equal(e.code, 8401);
-        test.done();
-    },
-    test_Forbidden: function (test) {
+        assert.ok(e instanceof errors.Unauthorized);
+        assert.ok(e instanceof errors.ClientError);
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof errors.CustomError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.UNAUTHORIZED]);
+        assert.equal(e.status, errors.StatusCode.UNAUTHORIZED);
+        assert.equal(e.code, 8401);
+    });
+    it('Forbidden', function () {
         var e = new errors.Forbidden();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.Forbidden);
-        test.ok(e instanceof errors.ClientError);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof errors.CustomError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.FORBIDDEN]);
-        test.equal(e.status, errors.StatusCode.FORBIDDEN);
-        test.equal(e.code, 8403);
-        test.done();
-    },
-    test_NotFound: function (test) {
+        assert.ok(e instanceof errors.Forbidden);
+        assert.ok(e instanceof errors.ClientError);
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof errors.CustomError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.FORBIDDEN]);
+        assert.equal(e.status, errors.StatusCode.FORBIDDEN);
+        assert.equal(e.code, 8403);
+    });
+    it('NotFound', function () {
         var e = new errors.NotFound();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.NotFound);
-        test.ok(e instanceof errors.ClientError);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof errors.CustomError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.NOT_FOUND]);
-        test.equal(e.status, errors.StatusCode.NOT_FOUND);
-        test.equal(e.code, 8404);
-        test.done();
-    },
-    test_ServerError: function (test) {
+        assert.ok(e instanceof errors.NotFound);
+        assert.ok(e instanceof errors.ClientError);
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof errors.CustomError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.NOT_FOUND]);
+        assert.equal(e.status, errors.StatusCode.NOT_FOUND);
+        assert.equal(e.code, 8404);
+    });
+    it('ServerError', function () {
         var e = new errors.ServerError();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.ServerError);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof errors.CustomError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.SERVER_ERROR]);
-        test.equal(e.status, errors.StatusCode.SERVER_ERROR);
-        test.equal(e.code, 8500);
-        test.done();
-    },
-    test_InternalServerError: function (test) {
+        assert.ok(e instanceof errors.ServerError);
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof errors.CustomError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.SERVER_ERROR]);
+        assert.equal(e.status, errors.StatusCode.SERVER_ERROR);
+        assert.equal(e.code, 8500);
+    });
+    it('InternalServerError', function () {
         var e = new errors.InternalServerError();
         debug(e);
         debug('toString:', e.toString());
         debug('message:', e.message);
         debug('name:', e.name);
-        test.ok(e instanceof errors.InternalServerError);
-        test.ok(e instanceof errors.ServerError);
-        test.ok(e instanceof errors.HttpError);
-        test.ok(e instanceof errors.CustomError);
-        test.ok(e instanceof Error);
-        test.equal(e.message, errors.StatusLine[errors.StatusCode.INTERNAL_SERVER_ERROR]);
-        test.equal(e.status, errors.StatusCode.INTERNAL_SERVER_ERROR);
-        test.equal(e.code, 8500);
-        test.done();
-    }
-};
+        assert.ok(e instanceof errors.InternalServerError);
+        assert.ok(e instanceof errors.ServerError);
+        assert.ok(e instanceof errors.HttpError);
+        assert.ok(e instanceof errors.CustomError);
+        assert.ok(e instanceof Error);
+        assert.equal(e.message, errors.StatusLine[errors.StatusCode.INTERNAL_SERVER_ERROR]);
+        assert.equal(e.status, errors.StatusCode.INTERNAL_SERVER_ERROR);
+        assert.equal(e.code, 8500);
+    });
+});

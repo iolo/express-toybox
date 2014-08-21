@@ -11,12 +11,16 @@ module.exports = function (grunt) {
             },
             all: ['libs/**/*.js']
         },
-        nodeunit: {
-            all: ['tests/**/*_test.js']
+        mochaTest: {
+            all: {
+                src:['tests/**/*_test.js'],
+                                options:{reporter:'spec'}
+                                }
+
         }
     });
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-nodeunit');
+    grunt.loadNpmTasks('grunt-mocha-test');
     grunt.registerTask('default', ['jshint']);
-    grunt.registerTask('test', ['jshint', 'nodeunit']);
+    grunt.registerTask('test', ['jshint', 'mochaTest']);
 };

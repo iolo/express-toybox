@@ -1,32 +1,35 @@
 'use strict';
 
 var
-    fs = require('fs'),
+    assert = require('assert'),
     superagent = require('superagent'),
     express = require('express'),
     server = require('../libs/server'),
     debug = require('debug')('test');
 
-module.exports = {
-    setUp: function (callback) {
-        this.app = express();
-        this.server = server.start(this.app, {port:3000}, callback);
-    },
-    tearDown: function (callback) {
-        server.stop(callback);
-    },
-    test_get: function (test) {
-        this.app.get('/test', function (req, res) {
-            res.status(200).end();
-        });
+describe('server', function () {
+    it('should start/stop', function (done) {
+        var app = express()
+            .get('/test', function (req, res) {
+                res.status(200).send('ok').end();
+            });
 
-        var req = superagent.agent().get('http://localhost:3000/test');
-        req.end(function (err, res) {
-            debug('***error', err);
-            //debug('***request', req);
-            //debug('***response', res);
-            test.equal(res.status, 200);
-            test.done();
+        server.start(app, {port: 3000}, function (err) {
+            assert.ifError(err);
+            superagent.agent()
+                .get('http://localhost:3000/test')
+                .end(function (err, res) {
+                    //debug('***error', err);
+                    assert.ifError(err);
+                    //debug('***request', req);
+                    //debug('***response', res);
+                    assert.equal(res.status, 200);
+                    assert.equal(res.text, 'ok');
+                    server.stop(function (err) {
+                        assert.ifError(err);
+                        done();
+                    });
+                });
         });
-    }
-};
+    });
+});
