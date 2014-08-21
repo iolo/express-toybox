@@ -4,43 +4,41 @@ var
     Q = require('q'),
     _ = require('lodash'),
     express = require('express'),
-    pluralize = require('pluralize'),
     errors = require('./errors'),
     debug = require('debug')('express-toybox:resource'),
     DEBUG = debug.enabled;
 
-var HANDLERS = {
-    index: {
-        method: 'get'
-    },
-    create: {
-        method: 'post'
-    },
-    show: {
-        method: 'get',
-        usePathParam: true
-    },
-    update: {
-        method: 'put',
-        usePathParam: true
-    },
-    destroy: {
-        method: 'delete',
-        usePathParam: true
-    }
-};
+var
+    PARAM_REGEXP = new RegExp('/:[^/]+$'),
+    HANDLERS = {
+        index: {
+            method: 'get'
+        },
+        create: {
+            method: 'post'
+        },
+        show: {
+            method: 'get',
+            param: true
+        },
+        update: {
+            method: 'put',
+            param: true
+        },
+        destroy: {
+            method: 'delete',
+            param: true
+        }
+    };
 
-// TODO: more clean & flexible configurations
-function configureResource(app, name, module) {
-    var path = '/' + pluralize(name);
-    var pathWithParam = path + '/:' + name;
-    DEBUG && debug('configure RESTful resources...', name, '-->', path, '&', pathWithParam);
+function configureResource(app, path, module) {
+    DEBUG && debug('configure RESTful resource on ', path);
 
     Object.keys(HANDLERS).forEach(function (handlerName) {
         var handlerFunc = module[handlerName];
         if (typeof handlerFunc === 'function') {
             var handlerInfo = HANDLERS[handlerName];
-            app[handlerInfo.method](handlerInfo.usePathParam ? pathWithParam : path, handlerFunc);
+            app[handlerInfo.method](handlerInfo.param ? path : path.replace(PARAM_REGEXP, ''), handlerFunc);
         }
     });
     return app;
@@ -50,8 +48,8 @@ function configureResource(app, name, module) {
 // mixin to express proto.
 //
 
-express.application.useResource = express.Router.useResource = function (name, module, opts) {
-    return configureResource(this, name, module, opts);
+express.application.useResource = express.Router.useResource = function (name, module) {
+    return configureResource(this, name, module);
 };
 
 module.exports = {
