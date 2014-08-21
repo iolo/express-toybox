@@ -4,7 +4,7 @@ var
     Q = require('q'),
     _ = require('lodash'),
     express = require('express'),
-    lingo = require('lingo'),
+    pluralize = require('pluralize'),
     errors = require('./errors'),
     debug = require('debug')('express-toybox:resource'),
     DEBUG = debug.enabled;
@@ -32,7 +32,7 @@ var HANDLERS = {
 
 // TODO: more clean & flexible configurations
 function configureResource(app, name, module) {
-    var path = lingo.en.pluralize(name);
+    var path = '/' + pluralize(name);
     var pathWithParam = path + '/:' + name;
     DEBUG && debug('configure RESTful resources...', name, '-->', path, '&', pathWithParam);
 
