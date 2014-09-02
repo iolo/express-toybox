@@ -3,6 +3,8 @@ express-toybox
 
 My Own Extra Stuff for [Express](http://expressjs.com).
 
+> NOTE: for full example, see [pictor](http://github.com/iolo/pictor] esp. `/config/defaults.js` and `/app.js`.
+
 ## errors
 
 ## utils
