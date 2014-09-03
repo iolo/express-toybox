@@ -90,10 +90,6 @@ function collectQueryParams(req, paramNames) {
     return result;
 }
 
-function collectDeviceParams(req) {
-    return _.merge({}, {uuid: req.ip, model: req.headers['user-agent']}, req.param('device'));
-}
-
 /**
  *
  * @param {int} offset - index of the first item of current page(aka. skip)
@@ -300,9 +296,6 @@ function extendHttpResponse() {
 
 module.exports = {
     collectQueryParams: collectQueryParams,
-    collectDeviceParams: collectDeviceParams,
-    generateCaptcha: generateCaptcha,
-    validateCaptcha: validateCaptcha,
     pagination: pagination,
     renderViewOrRedirectToNext: renderViewOrRedirectToNext,
     echo: echo,

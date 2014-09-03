@@ -3,8 +3,7 @@
 var
     Q = require('q'),
     path = require('path'),
-    express = require('express'),
-    expressToybox = require('../libs');//require('express-toybox');
+    express = require('express-toybox')(require('express'));
 
 var config = {
     http: {
