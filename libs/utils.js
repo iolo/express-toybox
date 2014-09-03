@@ -94,15 +94,6 @@ function collectDeviceParams(req) {
     return _.merge({}, {uuid: req.ip, model: req.headers['user-agent']}, req.param('device'));
 }
 
-// TODO: ...
-function generateCaptcha(res) {
-}
-
-// TODO: ...
-function validateCaptcha(req) {
-    // throw new ParamNotMatch('captcha');
-}
-
 /**
  *
  * @param {int} offset - index of the first item of current page(aka. skip)
@@ -137,6 +128,22 @@ function renderViewOrRedirectToNext(req, res, view, next, vm) {
         return res.render(view, _.extend({next: next}, vm));
     }
     return res.redirect(next);
+}
+
+/**
+ * simple echo route(http request handler) to easy test.
+ *
+ * @param {express.request} req
+ * @param {express.response} res
+ */
+function echo(req, res) {
+    // TODO: headers... and so on...
+    return res.json({
+        method: req.method,
+        path: req.baseUrl + req.path,
+        query: req.query,
+        body: req.body
+    });
 }
 
 /**
@@ -276,13 +283,6 @@ function extendHttpResponse() {
         }).done();
     };
 
-    res.sendFileLater = function (promise) {
-        var res = this;
-        Q.when(promise).then(function (result) {
-            res.sendFile(result);
-        }).done();
-    };
-
     res.redirectLater = function (promise) {
         var res = this;
         Q.when(promise).then(function (result) {
@@ -305,6 +305,7 @@ module.exports = {
     validateCaptcha: validateCaptcha,
     pagination: pagination,
     renderViewOrRedirectToNext: renderViewOrRedirectToNext,
+    echo: echo,
     extendHttpRequest: extendHttpRequest,
     extendHttpResponse: extendHttpResponse
 };

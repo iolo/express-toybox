@@ -13,14 +13,24 @@ module.exports = function (grunt) {
         },
         mochaTest: {
             all: {
-                src:['tests/**/*_test.js'],
-                                options:{reporter:'spec'}
-                                }
-
+                src: ['tests/**/*_test.js'],
+                options: {reporter: 'spec'}
+            }
+        },
+        doxx: {
+            lib: {
+                src: 'libs',
+                target: 'build/doxx',
+                options: {
+                }
+            }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-doxx');
     grunt.loadNpmTasks('grunt-mocha-test');
+
     grunt.registerTask('default', ['jshint']);
     grunt.registerTask('test', ['jshint', 'mochaTest']);
+    grunt.registerTask('docs', ['doxx']);
 };
