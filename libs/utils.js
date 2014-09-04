@@ -4,6 +4,7 @@ var
     Q = require('q'),
     _ = require('lodash'),
     express = require('express'),
+    utils = require('node-toybox').utils,
     errors = require('./errors'),
     debug = require('debug')('express-toybox:utils'),
     DEBUG = debug.enabled;
@@ -251,46 +252,58 @@ function extendHttpRequest() {
 function extendHttpResponse() {
     var res = express.response || require('http').ServerResponse.prototype;
 
-    res.sendLater = function (promise) {
+    var EMIT_METHODS = ['send', 'json', 'jsonp', 'sendFile', 'redirect', 'render'];
+
+
+    EMIT_METHODS.forEach(function (emitMethod) {
+        // callback helpers
+        //
+        // ex.
+        // ```
+        // fs.readFile('foo.txt', res.sendCallbackFn(next));
+        // ```
+        res[emitMethod + 'CallbackFn'] = function (next) {
+            var res = this;
+            return function (err, result) {
+                return err ? next(err) : res[emitMethod].call(res, result);
+            };
+        };
+
+        // promised helpers
+        //
+        // ex.
+        // ```
+        // var FS = require('q-io/fs');
+        // res.sendLater(FS.readFile('foo.txt'), next);
+        // ```
+        res[emitMethod + 'Later'] = function (promise, next) {
+            var res = this;
+            return Q.when(promise).then(function (result) {
+                return res[emitMethod].call(res, result);
+            }).fail(next).done();
+        };
+    });
+
+    // ```
+    // fs.stat('foo.txt', res.renderCallbackFn('stat_view', next));
+    // ```
+    res.renderCallbackFn = function (view, next) {
         var res = this;
-        Q.when(promise).then(function (result) {
-            res.send(result);
-        }).done();
+        return function (err, result) {
+            return err ? next(err) : res.render(view, result);
+        };
     };
 
-    res.jsonLater = function (promise) {
+    // ex.
+    // ```
+    // var FS = require('q-io/fs');
+    // res.renderLater('stat_view', FS.stat('foo.txt'), next);
+    // ```
+    res.renderLater = function (view, promise, next) {
         var res = this;
-        Q.when(promise).then(function (result) {
-            res.json(result);
-        }).done();
-    };
-
-    res.jsonpLater = function (promise) {
-        var res = this;
-        Q.when(promise).then(function (result) {
-            res.send(result);
-        }).done();
-    };
-
-    res.sendFileLater = function (promise) {
-        var res = this;
-        Q.when(promise).then(function (result) {
-            res.sendFile(result);
-        }).done();
-    };
-
-    res.redirectLater = function (promise) {
-        var res = this;
-        Q.when(promise).then(function (result) {
-            res.redirect(result);
-        }).done();
-    };
-
-    res.renderLater = function (view, promise) {
-        var res = this;
-        Q.when(promise).then(function (result) {
-            res.render(view, result);
-        }).done();
+        return Q.when(promise).then(function (result) {
+            return res.render(view, result);
+        }).fail(next).done();
     };
 }
 

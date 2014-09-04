@@ -5,8 +5,6 @@ var
     express = require('express'),
     errors = require('./errors'),
     utils = require('./utils'),
-    error404 = require('./error404'),
-    error500 = require('./error500'),
     debug = require('debug')('express-toybox:common'),
     DEBUG = debug.enabled;
 
@@ -82,21 +80,6 @@ function configureMiddlewares(app, config) {
         app.use(require('./multipart')(config.multipart));
     }
 
-    if (config.root) {
-        var root = path.resolve(process.cwd(), config.root);
-        DEBUG && debug('configure http static root:', root);
-        app.use(require('serve-favicon')(path.join(root, 'favicon.ico')));
-        app.use(require('serve-static')(root));
-    }
-
-    if (config.statics) {
-        Object.keys(config.statics).forEach(function (urlPrefix) {
-            var docRoot = path.resolve(process.cwd(), config.statics[urlPrefix]);
-            DEBUG && debug('configure http static route: ', urlPrefix, '--->', docRoot);
-            app.use(urlPrefix, require('serve-static')(docRoot));
-        });
-    }
-
     return app;
 }
 
@@ -116,15 +99,37 @@ function configureRoutes(app, config) {
     // 'GET /foo bar:qux' --> get('/foo', require('bar)['qux']) ???
     // ...
 
+    if (config.resources) {
+        Object.keys(config.resources).forEach(function (urlPrefix) {
+            DEBUG && debug('configure resource route: ', urlPrefix, '--->', config.resources[urlPrefix]);
+            require('./resource').configureResource(app, urlPrefix, require(config.resources[urlPrefix]));
+        });
+    }
+
+    if (config.statics) {
+        Object.keys(config.statics).forEach(function (urlPrefix) {
+            var dir = path.resolve(process.cwd(), config.statics[urlPrefix]);
+            DEBUG && debug('configure http static route: ', urlPrefix, '--->', dir);
+            app.use(urlPrefix, require('serve-static')(dir));
+        });
+    }
+
+    if (config.root) {
+        var root = path.resolve(process.cwd(), config.root);
+        DEBUG && debug('configure http static root:', root);
+        app.use(require('serve-favicon')(path.join(root, 'favicon.ico')));
+        app.use(require('serve-static')(root));
+    }
+
     DEBUG && debug('configure error routes', config.errors);
     if (config.errors) {
         var config404 = config.errors['404'];
         if (config404) {
-            app.use(error404(config404));
+            app.use(require('./error404')(config404));
         }
         var config500 = config.errors['500'];
         if (config500) {
-            app.use(error500(config500));
+            app.use(require('./error500')(config500));
         }
     }
 

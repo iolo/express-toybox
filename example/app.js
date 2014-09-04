@@ -2,8 +2,9 @@
 
 var
     Q = require('q'),
+    fs = require('fs'),
     path = require('path'),
-    express = require('express-toybox')(require('express'));
+    express = require('../libs')(require('express'));//require('express-toybox')(require('express'));
 
 var config = {
     http: {
@@ -20,14 +21,14 @@ var config = {
         //csrf: {},
         json: {},
         urlencoded: {},
-        multipart: {},
+        multipart: {}
+    },
+    routes: {
         root: path.join(__dirname, '/to_be_root'),
         statics: {
             '/asset': path.join(__dirname, '/to_be_asset'),
             '/source': path.join(__dirname, '../libs')
-        }
-    },
-    routes: {
+        },
         errors: {
             404: {},
             500: {}
@@ -106,6 +107,32 @@ var app = express()
     })
     .get('/error/custom', function (req, res) {
         throw {status: 999, message: 'custom error!'};
+    })
+    .get('/send/callback', function (req, res, next) {
+        var file = path.join(__dirname, req.param('file'));
+        res.type(express.toybox.mimetype(file, 'text/html'));
+        fs.readFile(file, res.sendCallbackFn(next));
+    })
+    .get('/json/callback', function (req, res, next) {
+        var file = path.join(__dirname, req.param('file'));
+        fs.stat(file, res.jsonCallbackFn(next));
+    })
+    .get('/render/callback', function (req, res, next) {
+        var file = path.join(__dirname, req.param('file'));
+        fs.stat(file, res.renderCallbackFn('render_test', next));
+    })
+    .get('/send/later', function (req, res, next) {
+        var file = path.join(__dirname, req.param('file'));
+        res.type(express.toybox.mimetype(file, 'text/html'));
+        res.sendLater(Q.nfcall(fs.readFile, file), next);
+    })
+    .get('/json/later', function (req, res, next) {
+        var file = path.join(__dirname, req.param('file'));
+        res.jsonLater(Q.nfcall(fs.stat, file), next);
+    })
+    .get('/render/later', function (req, res, next) {
+        var file = path.join(__dirname, req.param('file'));
+        res.renderLater('render_test', Q.nfcall(fs.stat, file), next);
     })
     .get('/dont/stop/me/now', function (req, res) {
         express.toybox.server.stop(function () {
