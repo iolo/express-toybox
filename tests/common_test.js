@@ -6,16 +6,16 @@ var
     common = require('../libs/common'),
     debug = require('debug')('test');
 
-describe('common middlewares', function () {
-    it('should support configureMiddlewares() function', function (done) {
-        var app = common.configureMiddlewares(express(), {logger: 'combined', statics: {'/test': __dirname}});
+describe('common', function () {
+    it('should support configureRoutes() function', function (done) {
+        var app = common.configureRoutes(express(), {statics: {'/test': __dirname}});
         supertest(app)
             .get('/test/foo.txt')
             .expect(200)
             .expect('FOO', done);
     });
-    it('should support useCommonMiddlewares() method', function (done) {
-        var app = express().useCommonMiddlewares({logger: 'combined', statics: {'/test': __dirname}});
+    it('should support useCommonRoutes() method', function (done) {
+        var app = express().useCommonRoutes({statics: {'/test': __dirname}});
         supertest(app)
             .get('/test/foo.txt')
             .expect(200)
