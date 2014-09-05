@@ -3,7 +3,7 @@ express-toybox
 
 My Own Extra Stuff for [Express](http://expressjs.com).
 
-## usage
+## getting started
 
 ### install module via npm
 
@@ -21,16 +21,14 @@ $ grunt docs
 $ open build/doxx/index.html
 ```
 
-### load express-toybox module over express
+### require it with/wihtout express
 
 ```javascript
 var express = require('express-toybox')(require('express'));
 //var express = require('express-toybox')();
 express.toybox.utils.collectQueryParams(req);
 ```
-
 or
-
 ```javascript
 var express = require('express'),
     expressToybox = require('express-toybox');
@@ -42,19 +40,28 @@ expressToybox.utils.collectQueryParams(req);
 
 ### errors
 
-* TBW: ...
+* StatusCode
+* StatusLine
+* HttpError
+* ClientError
+* BadRequest
+* Unauthorized
+* Forbidden
+* NotFound
+* ServerError
+* InternalServerError
+* NotImplemented
+* ...
 
 ### commons
 
-* configureMiddlewares(config)
-* configureRoutes(config)
-* TBW: ...
+* [configureMiddlewares(config)](#declarative-middlewares)
+* [configureRoutes(config)](#declarative-routes)
 
 ### server
 
-* start(config, callback)
-* stop(callback)
-* TBW: ...
+* start()
+* stop()
 
 ### utils
 
@@ -62,210 +69,333 @@ expressToybox.utils.collectQueryParams(req);
 * pagination()
 * renderViewOrRedirectToNext()
 * echo()
-* extendHttpRequest()
-* extendHttpResponse()
-* TBW: ...
+* extendHttpRequest() - additional methods for http request(http.IncomingMessage)
+    - req.strParam(name, fallback)
+    - req.intParam(name, fallback)
+    - req.numberParam(name, fallback)
+    - req.boolParam(name, fallback)
+    - req.collectParams(names)
+    - ...
+* extendHttpResponse() - additional methods for http response(http.ServerResponse)
+    - res.sendCallbackFn(next)
+    - res.jsonCallbackFn(next)
+    - res.jsonpCallbackFn(next)
+    - res.sendFileCallbackFn(next)
+    - res.redirectCallbackFn(next)
+    - res.renderCallbackFn(view, next)
+    - res.sendLater(promise, next)
+    - res.jsonLater(promise, next)
+    - res.jsonpLater(promise, next)
+    - res.sendFileLater(promise, next)
+    - res.redirectLater(promise, next)
+    - res.renderLater(view, promise, next)
+    - ...
+* ...
 
+<a id="cors-middleware"></a>
 ### cors
 
-* TBW: ...
-
-```javascript
-express()
-    ...
-    .use(express.toybox.cors(config))
-    ...
+* usage
+```
+express()...use(express.toybox.cors(config))...
 ```
 
+* config
+```
+{
+TBW: ...
+}
+```
+
+<a id="logger-middleware"></a>
 ### logger
 
-* TBW: ...
+* usage
 
-```javascript
-express()
-    ...
-    .use(express.toybox.logger(config))
-    ...
+```
+express()...use(express.toybox.logger(config))...
 ```
 
+* log to console using morgan: 'combined', 'common', 'short', 'tiny', 'default' or 'dev'
+* log to file using morgan
+```
+{
+    file:'path-to-log-file',
+    format:'morgan-format',
+    morgan-options...
+}
+```
+* log to debug using morgan-debug
+```
+{
+    debug:'debug-namespace',
+    format:'morgan-format',
+    morgan-debug-options...
+}
+```
+* ...
+
+<a id="session-middleware"></a>
 ### session
 
-* TBW: ...
-
-```javascript
-express()
-    ...
-    .use(express.toybox.session(config));
-    ...
+* usage
+```
+express()...use(express.toybox.session(config))...
 ```
 
-## resource
+* express-session with memory store: `{express-session-options...}`
+* express-session with custom store:
+```
+{
+    store:{
+        module:'store-module-name',
+        store-module-options...
+    },
+    express-session-options...
+}
+```
+* ...
 
-* TBW: ...
+<a id="resource-middleware"></a>
+### resource
 
-```javascript
-express()
-    ...
-    .useResource(path, config);
-    ...
+* usage
+```
+express()...useResource(path, resource-module)...
 ```
 
+* example
+```javascript
+useResource('/posts/:id', {
+    // get /posts
+    index: function (req, res) { ... },
+    // post /posts
+    create: ...
+    // get /posts/123
+    show: function (req, res) { req.param('123')... }
+    // put /posts/123
+    update: ...
+    // delete /posts/123
+    destroy: ...
+    ...
+});
+```
+
+<a id="error404-middleware"></a>
 ### error404
 
-* TBW: ...
+send custom http 404 error with json/html/text by accept header in request.
 
-```javascript
-express()
-    ...
-    .use(express.toybox.error404(config))
-    ...
+* usage
+```
+express()...use(express.toybox.error404(config))...
 ```
 
+* config
+```
+{
+    view:'path-view-template',
+    code:custom-error-code,
+    message:'custom-error-message'
+    ...
+}
+```
+
+<a id="errorr500-middleware"></a>
 ### error500
 
-* TBW: ...
+send custom http error with json/html/text by accept header in request.
 
-```javascript
-express()
-    ...
-    .use(express.toybox.error500(config))
+* usage
+```
+express()...use(express.toybox.error500(config))...
 ```
 
-## declarative configuration for middlewares
-
-```javascript
-express()
-    ...
-    .useCommonMiddlewares(config)
-    ...
-    .listen(8080);
+* config
+```
+{
+    view:'path-view-template',
+    mappings:{'error-name':error-code, ...},
+    stack:true/false
+}
 ```
 
+<a id="declarative-middlewares"></a>
+## declarative middlewares
+
+* usage
+```
+express()...useCommonMiddlewares(config)...
+```
 or
-
-```javascript
+```
 var app = express();
 ...
 express.toybox.common.configureMiddlewares(app, config);
 ...
-app.listen(8000);
 ```
 
-### additional methods for http request(http.IncomingMessage)
-
-* req.strParam(name, fallback)
-* req.intParam(name, fallback)
-* req.numberParam(name, fallback)
-* req.boolParam(name, fallback)
-* req.collectParams(names)
-* TBW: ...
-
-### additional methods for http response(http.ServerResponse)
-
-* res.sendLater(promise)
-* res.jsonLater(promise)
-* res.jsonpLater(promise)
-* res.sendFileLater(promise)
-* res.redirectLater(promise)
-* res.renderLater(view, promise)
-* TBW: ...
+* config
+```
+{
+    logger: {logger-config...},
+    compress: {compress-config...},
+    cookieParser: {cookieParser-config...},
+    methodOverride: {methodOverride-config...},
+    cors: {cors-config...},
+    session: {session-config...},
+    csrf: {csrf-config...},
+    urlencoded: {urlencoded-config...},
+    json: {json-config...},
+    multipart: {multipart-config...},
+    ...
+}
+```
 
 ### logger
 
-* configure [morgan](https://github.com/expressjs/morgan) middleware(contrib) or [morgan-debug](https://github.com/ChiperSoft/morgan-debug) middleware(by ChiperSoft) via [logger](libs/logger.js) middleware(custom).
-* TBW: ...
+* configure [morgan](https://github.com/expressjs/morgan) middleware(contrib) or [morgan-debug](https://github.com/ChiperSoft/morgan-debug) middleware(by ChiperSoft)
+* via [logger](#logger-middleware) middleware(custom).
 
 ### compress(or compression)
 
 * configure [compression](https://github.com/expressjs/compression) middleware(contrib).
-* TBW: ...
+```
+{
+TBW: ...
+}
+```
 
 ### cookieParser
 
 * configure [cookie-parser](https://github.com/expressjs/cookie-parser) middleware(contrib).
-* TBW: ...
+```
+{
+TBW: ...
+}
+```
 
 ### methodOverride
 
 * configure [method-override](https://github.com/expressjs/method-override) middleware(contrib).
-* TBW: ...
+```
+{
+TBW: ...
+}
+```
 
 ### cors
 
-* configure [cors](libs/cors.js) middleware(custom).
-* TBW: ...
+* configure [cors](#cors-middleware) middleware(custom).
 
 ### session
 
-* configure [express-session](https://github.com/expressjs/session) middleware(contrib) via [session](libs/session.js) middleware(custom).
-* TBW: ...
+* configure [express-session](https://github.com/expressjs/session) middleware(contrib)
+* via [session](#session-middleware) middleware(custom).
 
 ### csrf(or csurf)
 
 * configure [csurf](https://github.com/expressjs/csurf) middleware(contrib).
-* TBW: ...
+```
+{
+TBW: ...
+}
+```
 
 ### urlencoded
 
 * configure [body-parser](https://github.com/expressjs/body-parser) middleware(contrib).
-* TBW: ...
+```
+{
+TBW: ...
+}
+```
 
 ### json
 
 * configure [body-parser](https://github.com/expressjs/body-parser) middleware(contrib).
-* TBW: ...
+```
+{
+TBW: ...
+}
+```
 
 ### multipart
 
 * configure [multiparty](https://github.com/andrewrk/node-multiparty) middleware(by andrewrk).
-* TBW: ...
+```
+{
+TBW: ...
+}
+```
 
-### root
+<a id="declarative-routes"></a>
+## declarative routes
 
-* configure [serve-static](https://github.com/expressjs/serve-favicon) middleware(contrib) and [serve-favicon](https://github.com/expressjs/serve-favicon) middleware(contrib).
-* TBW: ...
-
-### statics
-
-* configure [serve-static](https://github.com/expressjs/serve-favicon) middleware(contrib).
-* TBW: ...
-
-## declarative configuration for routes
-
+* usage
+```
+express()...useCommonRoutes(config)...
+```
+or
 ```javascript
 var app = express();
 ...
 express.toybox.common.configureRoutes(app, config);
 //expressToybox.common.configureRoutes(app, config);
 ...
-app.listen(8080);
 ```
 
-or 
+* config
+```
+{
+    root: path-to-directory,
+    statics: {statics-config...},
+    resources: {resources-config...},
+    errors: {errors-config...},
+    ...
+}
+```
 
-```javascript
-express()
+### root
+
+* configure [serve-static](https://github.com/expressjs/serve-favicon) middleware(contrib) and [serve-favicon](https://github.com/expressjs/serve-favicon) middleware(contrib).
+
+### statics
+
+* configure multiple [serve-static](https://github.com/expressjs/serve-favicon) middleware(contrib).
+```
+{
+    'url-path': 'path-to-static-content-directory'
     ...
-    .useCommonRoutes(config)
-    ...
-    .listen(8080);
+}
 ```
 
 ### resources
 
-* configure RESTful routes via [resource](libs/resource.js).
-* TBW: ...
+* configure multiple [resource](#resource-middleware) middleware(custom).
+```
+{
+    'url-path': 'resource-module-name'
+    ...
+}
+```
 
 ### errors
 
-#### error404(custom)
+```
+{
+    '404': {error404-config...},
+    '500': {error500-config...},
+    ...
+}
+```
 
-* configure [error404](libs/error404.js) middleware(custom).
-* TBW: ...
+#### error404
 
-#### error500(custom)
+* configure [error404](#error4040-middleware) middleware(custom).
 
-* configure [error500](libs/error500.js) middleware(custom) and [errorhandler](https://github.com/expressjs/errorhandler) middleware(contrib).
-* TBW: ...
+#### error500
+
+* configure [error500](#error500-middleware) middleware(custom) and [errorhandler](https://github.com/expressjs/errorhandler) middleware(contrib).
 
 *may the source be with you...*
