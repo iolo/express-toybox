@@ -168,36 +168,6 @@ function NotImplemented(message, cause) {
 util.inherits(NotImplemented, ServerError);
 NotImplemented.prototype.name = 'NotImplemented';
 
-//
-// custom http errors
-//
-
-/**
- * alias of 401 {@link Unauthorized}.
- *
- * @param {String} [message]
- * @param {*} [cause]
- * @constructor
- */
-function InvalidSession(message, cause) {
-    Unauthorized.super_.call(this, message || 'Invalid Session', cause);
-}
-util.inherits(InvalidSession, Unauthorized);
-InvalidSession.prototype.name = 'InvalidSession';
-
-/**
- * alias of 403 {@link Forbidden}.
- *
- * @param {String} [message]
- * @param {*} [cause]
- * @constructor
- */
-function AccessDenied(message, cause) {
-    AccessDenied.super_.call(this, message || 'Access Denied', cause);
-}
-util.inherits(AccessDenied, Forbidden);
-AccessDenied.prototype.name = 'AccessDenied';
-
 // XXX: support custom error registration with unique code
 module.exports = _.extend(errors, {
     StatusCode: StatusCode,
@@ -210,7 +180,5 @@ module.exports = _.extend(errors, {
     NotFound: NotFound,
     ServerError: ServerError,
     InternalServerError: InternalServerError,
-    NotImplemented: NotImplemented,
-    InvalidSession: InvalidSession,
-    AccessDenied: AccessDenied
+    NotImplemented: NotImplemented
 });
