@@ -12,7 +12,6 @@ var
         logger: require('./logger'),
         error500: require('./error500'),
         error404: require('./error404'),
-        mimetype: require('./mimetype'),
         server: require('./server')
     };
 

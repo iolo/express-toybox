@@ -1,6 +1,6 @@
 {
     "name": "express-toybox",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "description": "My Own Extra Stuff for Express",
     "author": "Dongsu Jang <iolothebard@gmail.com>",
     "repository": {
@@ -37,6 +37,7 @@
         "grunt-contrib-jshint": "latest",
         "grunt-doxx": "^0.1.1",
         "grunt-mocha-test": "^0.11.0",
+        "mime": "^1.2.11",
         "mocha": "^1.21.4",
         "superagent": "^0.18.1",
         "supertest": "^0.13.0"

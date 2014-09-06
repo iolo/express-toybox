@@ -4,6 +4,7 @@ var
     Q = require('q'),
     fs = require('fs'),
     path = require('path'),
+    mime = require('mime'),
     express = require('../libs')(require('express'));//require('express-toybox')(require('express'));
 
 var config = {
@@ -110,7 +111,7 @@ var app = express()
     })
     .get('/send/callback', function (req, res, next) {
         var file = path.join(__dirname, req.param('file'));
-        res.type(express.toybox.mimetype(file, 'text/html'));
+        res.type(mime(file));
         fs.readFile(file, res.sendCallbackFn(next));
     })
     .get('/json/callback', function (req, res, next) {
@@ -123,7 +124,7 @@ var app = express()
     })
     .get('/send/later', function (req, res, next) {
         var file = path.join(__dirname, req.param('file'));
-        res.type(express.toybox.mimetype(file, 'text/html'));
+        res.type(mime(file));
         res.sendLater(Q.nfcall(fs.readFile, file), next);
     })
     .get('/json/later', function (req, res, next) {
