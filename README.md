@@ -194,12 +194,15 @@ express()...use(express.toybox.error404(config))...
 * config
 ```
 {
-    view:'path-view-template',
-    code:custom-error-code,
-    message:'custom-error-message'
+    code: custom-error-code,
+    message:'custom-error-message',
+    template: 'lodash-micro-template-string-for-404-error-page',
+    view:'path-view-template'
     ...
 }
 ```
+
+* example: see [test case](tests/error404_test.js)
 
 <a id="errorr500-middleware"></a>
 ### error500
@@ -214,11 +217,17 @@ express()...use(express.toybox.error500(config))...
 * config
 ```
 {
+    status: custom-status-code,
+    code: custom-error-code,
+    mappings:{'err.name':{err-response-body...}, 'err.code': {err-response-body...}, ...},
+    stack:true/false,
+    template: 'lodash-micro-template-string-for-error-page',
     view:'path-view-template',
-    mappings:{'error-name':error-code, ...},
-    stack:true/false
+    ...
 }
 ```
+
+* see [test case](tests/error500_test.js)
 
 <a id="declarative-middlewares"></a>
 ## declarative middlewares
@@ -245,9 +254,11 @@ express.toybox.common.configureMiddlewares(app, config);
     cors: {cors-config...},
     session: {session-config...},
     csrf: {csrf-config...},
+    multipart: {multipart-config...},
     urlencoded: {urlencoded-config...},
     json: {json-config...},
-    multipart: {multipart-config...},
+    text: {text-config...},
+    raw: {raw-config...},
     ...
 }
 ```
@@ -302,9 +313,18 @@ TBW: ...
 }
 ```
 
+### multipart
+
+* configure [multiparty](https://github.com/andrewrk/node-multiparty) middleware(by andrewrk) for `multipart/form-data` request.
+```
+{
+TBW: ...
+}
+```
+
 ### urlencoded
 
-* configure [body-parser](https://github.com/expressjs/body-parser) middleware(contrib).
+* configure [body-parser](https://github.com/expressjs/body-parser) urlencoded middleware(contrib) for `application/x-www-form-urlencoded` request.
 ```
 {
 TBW: ...
@@ -313,16 +333,25 @@ TBW: ...
 
 ### json
 
-* configure [body-parser](https://github.com/expressjs/body-parser) middleware(contrib).
+* configure [body-parser](https://github.com/expressjs/body-parser) json middleware(contrib) for `application/json` request.
 ```
 {
 TBW: ...
 }
 ```
 
-### multipart
+### text
 
-* configure [multiparty](https://github.com/andrewrk/node-multiparty) middleware(by andrewrk).
+* configure [body-parser](https://github.com/expressjs/body-parser) text middleware(contrib) for `plain/text` request.
+```
+{
+TBW: ...
+}
+```
+
+### raw
+
+* configure [body-parser](https://github.com/expressjs/body-parser) raw middleware(contrib) for `application/octet-stream` request.
 ```
 {
 TBW: ...

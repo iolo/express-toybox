@@ -1,6 +1,6 @@
 {
     "name": "express-toybox",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "description": "My Own Extra Stuff for Express",
     "author": "Dongsu Jang <iolothebard@gmail.com>",
     "repository": {
