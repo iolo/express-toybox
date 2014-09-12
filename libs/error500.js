@@ -10,17 +10,24 @@ var
 
 var
     DEF_CONFIG = {
-        view: 'errors/500',
-        mappings: {}
+        status: 500,
+        code: 8500,
+        mappings: {}, // {ENOENT: {status:404, message:'NOT FOUND'}}
+        stack: false,
+        template: '',
+        view: 'errors/500'
     };
 
 /**
  * express uncaught error handler.
  *
  * @param {*} options
- * @param {String} [options.view='errors/500']
- * @param {*} [options.mappings={}]
+ * @param {Number} [options.status=500]
+ * @param {Number} [options.code=8500]
+ * @param {*} [options.mappings={}] map err.name/err.code to error response.
  * @param {Boolean} [options.stack=false]
+ * @param {String} [options.template] lodash(underscore) micro template for html error page.
+ * @param {String} [options.view='errors/500'] express view path of html error page.
  * @returns {Function} express error handler
  */
 function error500(options) {
@@ -30,13 +37,13 @@ function error500(options) {
         console.error('uncaught express error:', err);
         DEBUG && debug(err.stack);
 
-        // TODO: error mappings by err.name, err.code, ...
-        var error = {
-            status: err.status || options.mappings[err.name] || 500,
-            code: err.code || 0,
+        var error = _.extend({
+            status: err.status || options.status,
+            code: err.code || options.code,
             message: err.message || String(err),
             cause: err.cause
-        };
+        }, options.mappings[err.name], options.mappings[err.code]);
+
         if (options.stack) {
             error.stack = (err.stack && err.stack.split('\n')) || [];
         }
@@ -47,6 +54,10 @@ function error500(options) {
             case 'json':
                 return res.json(error);
             case 'html':
+                if (options.template) {
+                    res.type('html');
+                    return res.send(_.template(options.template, {error: error}));
+                }
                 return res.render(options.view, {error: error});
         }
         return res.send(util.inspect(error));

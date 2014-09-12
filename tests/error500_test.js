@@ -9,42 +9,95 @@ var
 describe('error500 middleware', function () {
     it('should return 500 for uncaught exception', function (done) {
         var app = express()
-            .all('/500', function (req, res, next) {
+            .all('/test', function (req, res, next) {
                 throw new Error("error");
             })
             .use(error500());
 
         supertest(app)
-            .get('/500')
+            .get('/test')
             .set('Accept', 'application/json')
             .expect(500)
-            .expect({status: 500, code: 0, message: 'error'}, done);
+            .expect({status: 500, code: 8500, message: 'error'}, done);
     });
     it('should return custom status code', function (done) {
         var app = express()
-            .all('/501', function (req, res, next) {
+            .all('/test', function (req, res, next) {
                 var HttpError = require('../libs/errors').HttpError;
-                throw new HttpError('ERROR501', 501, 'CAUSE501');
+                throw new HttpError('error', 501, 'cause');
             })
             .use(error500());
 
         supertest(app)
-            .get('/501')
+            .get('/test')
             .set('Accept', 'application/json')
             .expect(501)
-            .expect({status: 501, code: 8501, message: 'ERROR501', cause: 'CAUSE501'}, done);
+            .expect({status: 501, code: 8501, message: 'error', cause: 'cause'}, done);
     });
     it('should return custom error response', function (done) {
         var app = express()
-            .all('/502', function (req, res, next) {
-                throw {status: 502, code: 1502, message: 'ERROR502', cause: 'CAUSE502'};
+            .all('/test', function (req, res, next) {
+                throw {status: 502, code: 1502, message: 'error', cause: 'cause'};
             })
             .use(error500());
 
         supertest(app)
-            .get('/502')
+            .get('/test')
             .set('Accept', 'application/json')
             .expect(502)
-            .expect({status: 502, code: 1502, message: 'ERROR502', cause: 'CAUSE502'}, done);
+            .expect({status: 502, code: 1502, message: 'error', cause: 'cause'}, done);
+    });
+    it('should return mapped-by-err.code error response', function (done) {
+        var app = express()
+            .all('/test', function (req, res, next) {
+                throw {status: 599, code: 8599, message: 'error', cause: 'cause'};
+            })
+            .use(error500({
+                mappings: {
+                    8599: {
+                        status: 588,
+                        message: 'mapped'
+                    }
+                }
+            }));
+
+        supertest(app)
+            .get('/test')
+            .set('Accept', 'application/json')
+            .expect(588)
+            .expect({status: 588, code: 8599, message: 'mapped', cause: 'cause'}, done);
+    });
+    it('should return mapped-by-err.name error response', function (done) {
+        var app = express()
+            .all('/test', function (req, res, next) {
+                // this will throw ENOENT
+                require('fs').readFileSync('__not_found__');
+            })
+            .use(error500({
+                mappings: {
+                    ENOENT: {status: 404, code: 8404, message: 'MAPPED'}
+                }
+            }));
+
+        supertest(app)
+            .get('/test')
+            .set('Accept', 'application/json')
+            .expect(404)
+            .expect({status: 404, code: 8404, message: 'MAPPED'}, done);
+    });
+    it('should return html error response with template', function (done) {
+        var app = express()
+            .all('/test', function (req, res, next) {
+                throw {status: 599, code: 8599, message: 'error', cause: 'cause'};
+            })
+            .use(error500({
+                template: '<h1><%=error.status%>:<%=error.code%>:<%=error.message%>:<%=error.cause%></h1>'
+            }));
+
+        supertest(app)
+            .get('/test')
+            .set('Accept', 'text/html')
+            .expect(599)
+            .expect('<h1>599:8599:error:cause</h1>', done);
     });
 });
