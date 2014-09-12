@@ -65,6 +65,11 @@ function configureMiddlewares(app, config) {
         app.use(require('csurf')(config.csrf || config.csurf));
     }
 
+    // multipart/form-data
+    if (config.multipart) {
+        app.use(require('./multipart')(config.multipart));
+    }
+
     // application/json
     if (config.json) {
         app.use(require('body-parser').json(config.json));
@@ -72,12 +77,18 @@ function configureMiddlewares(app, config) {
 
     // application/x-www-form-urlencoded
     if (config.urlencoded) {
+        config.urlencoded.extended = !!config.urlencoded.extended;
         app.use(require('body-parser').urlencoded(config.urlencoded));
     }
 
-    // multipart/form-data
-    if (config.multipart) {
-        app.use(require('./multipart')(config.multipart));
+    // plain/text
+    if (config.text) {
+        app.use(require('body-parser').text(config.text));
+    }
+
+    // application/octet-stream
+    if (config.raw) {
+        app.use(require('body-parser').raw(config.text));
     }
 
     return app;
@@ -96,7 +107,7 @@ function configureRoutes(app, config) {
     config = config || {};
 
     // TODO: add declarative routes
-    // 'GET /foo bar:qux' --> get('/foo', require('bar)['qux']) ???
+    // 'GET /foo bar/baz:qux' --> get('/foo', require('bar/baz')['qux'])
     // ...
 
     if (config.resources) {
@@ -117,8 +128,11 @@ function configureRoutes(app, config) {
     if (config.root) {
         var root = path.resolve(process.cwd(), config.root);
         DEBUG && debug('configure http static root:', root);
-        app.use(require('serve-favicon')(path.join(root, 'favicon.ico')));
         app.use(require('serve-static')(root));
+
+        var favicon = path.join(root, 'favicon.ico');
+        DEBUG && debug('configure http favicon route:', favicon);
+        app.use(require('serve-favicon')(favicon));
     }
 
     DEBUG && debug('configure error routes', config.errors);
