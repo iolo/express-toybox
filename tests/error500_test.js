@@ -3,7 +3,7 @@
 var
     supertest = require('supertest'),
     express = require('express'),
-    error500 = require('../libs/error500'),
+    error500 = require('../error500'),
     debug = require('debug')('test');
 
 describe('error500 middleware', function () {
@@ -23,7 +23,7 @@ describe('error500 middleware', function () {
     it('should return custom status code', function (done) {
         var app = express()
             .all('/test', function (req, res, next) {
-                var HttpError = require('../libs/errors').HttpError;
+                var HttpError = require('../errors').HttpError;
                 throw new HttpError('error', 501, 'cause');
             })
             .use(error500());

@@ -6,7 +6,7 @@ var
     assert = require('assert'),
     supertest = require('supertest'),
     express = require('express'),
-    multipart = require('../libs/multipart'),
+    multipart = require('../multipart'),
     debug = require('debug')('test');
 
 describe('multipart middleware', function () {

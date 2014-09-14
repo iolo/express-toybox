@@ -4,7 +4,7 @@ var
     assert = require('assert'),
     superagent = require('superagent'),
     express = require('express'),
-    server = require('../libs/server'),
+    server = require('../server'),
     debug = require('debug')('test');
 
 describe('server', function () {

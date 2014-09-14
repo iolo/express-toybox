@@ -3,7 +3,7 @@
 var
     supertest = require('supertest'),
     express = require('express'),
-    common = require('../libs/common'),
+    common = require('../common'),
     debug = require('debug')('test');
 
 describe('common', function () {

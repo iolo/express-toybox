@@ -2,7 +2,7 @@
 
 var
     assert = require('assert'),
-    errors = require('../libs/errors'),
+    errors = require('../errors'),
     debug = require('debug')('test');
 
 describe('errors', function () {

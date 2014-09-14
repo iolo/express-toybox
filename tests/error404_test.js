@@ -3,7 +3,7 @@
 var
     supertest = require('supertest'),
     express = require('express'),
-    error404 = require('../libs/error404'),
+    error404 = require('../error404'),
     debug = require('debug')('test');
 
 describe('error404 middeware', function () {

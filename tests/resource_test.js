@@ -4,7 +4,7 @@ var
     assert = require('assert'),
     supertest = require('supertest'),
     express = require('express'),
-    resource = require('../libs/resource'),
+    resource = require('../resource'),
     debug = require('debug')('test');
 
 describe('resource', function () {
