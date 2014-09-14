@@ -4,7 +4,7 @@ var
     Q = require('q'),
     _ = require('lodash'),
     express = require('express'),
-    utils = require('node-toybox').utils,
+    utils = require('node-toybox/utils'),
     errors = require('./errors'),
     debug = require('debug')('express-toybox:utils'),
     DEBUG = debug.enabled;
