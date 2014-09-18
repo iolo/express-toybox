@@ -21,6 +21,14 @@ $ grunt docs
 $ open build/doxx/index.html
 ```
 
+### run example
+
+```
+$ export DEBUG='*'
+$ node example/app.js
+$ open http://localhost:3333
+```
+
 ### require it with/wihtout express
 
 ```javascript
