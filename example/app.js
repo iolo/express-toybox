@@ -4,8 +4,7 @@ var
     Q = require('q'),
     fs = require('fs'),
     path = require('path'),
-    mime = require('mime'),
-    express = require('../libs')(require('express'));//require('express-toybox')(require('express'));
+    express = require('../index')(require('express'));//require('express-toybox')(require('express'));
 
 var config = {
     http: {
@@ -32,7 +31,9 @@ var config = {
         },
         errors: {
             404: {},
-            500: {}
+            500: {
+                mappings: {ENOENT: {status:404, message:'NOT FOUND'}}
+            }
         }
     }
 };
@@ -111,8 +112,7 @@ var app = express()
     })
     .get('/send/callback', function (req, res, next) {
         var file = path.join(__dirname, req.param('file'));
-        res.type(mime(file));
-        fs.readFile(file, res.sendCallbackFn(next));
+        fs.stat(file, res.sendCallbackFn(next));
     })
     .get('/json/callback', function (req, res, next) {
         var file = path.join(__dirname, req.param('file'));
@@ -124,8 +124,7 @@ var app = express()
     })
     .get('/send/later', function (req, res, next) {
         var file = path.join(__dirname, req.param('file'));
-        res.type(mime(file));
-        res.sendLater(Q.nfcall(fs.readFile, file), next);
+        res.sendLater(Q.nfcall(fs.stat, file), next);
     })
     .get('/json/later', function (req, res, next) {
         var file = path.join(__dirname, req.param('file'));
