@@ -77,21 +77,33 @@ expressToybox.utils.collectQueryParams(req);
 * pagination()
 * renderViewOrRedirectToNext()
 * echo()
-* extendHttpRequest() - additional methods for http request(http.IncomingMessage)
+* extendHttpRequest() - additional methods for express.request(http.IncomingMessage)
     - req.strParam(name, fallback)
     - req.intParam(name, fallback)
     - req.numberParam(name, fallback)
     - req.boolParam(name, fallback)
     - req.collectParams(names)
     - ...
-* extendHttpResponse() - additional methods for http response(http.ServerResponse)
+* extendHttpResponse() - additional methods for express.response(http.ServerResponse)
     - res.sendCallbackFn(next)
+        ```javascript
+        var fs = require('fs');
+        app.get('/foo', function (req, res, next) {
+                fs.readFile('file.txt', res.sendCallbackFn(next));
+        });
+        ```
     - res.jsonCallbackFn(next)
     - res.jsonpCallbackFn(next)
     - res.sendFileCallbackFn(next)
     - res.redirectCallbackFn(next)
     - res.renderCallbackFn(view, next)
     - res.sendLater(promise, next)
+        ```javascript
+        var FS = require('q-io/fs');
+        app.get('/bar', function (req, res, next) {
+                res.sendLater(FS.readFile('file.txt'), next);
+        });
+        ```
     - res.jsonLater(promise, next)
     - res.jsonpLater(promise, next)
     - res.sendFileLater(promise, next)
@@ -180,7 +192,7 @@ useResource('/posts/:id', {
     // post /posts
     create: ...
     // get /posts/123
-    show: function (req, res) { req.param('123')... }
+    show: function (req, res) { assert(req.param('id') == 123)... }
     // put /posts/123
     update: ...
     // delete /posts/123
