@@ -15,7 +15,7 @@ var
  * @param {Boolean} [options.immediate]
  * @param {Function} [options.skip]
  * @param {*} [options.stream]
- * @param {String} [options.format='default'] log format. "combined", "common", "dev", "short", "tiny" or "default".
+ * @param {String} [options.format='combined'] log format. "combined", "common", "dev", "short", "tiny" or "default".
  * @param {String} [options.file] file to emit log.
  * @param {String} [options.debug] namespace for tj's debug namespace to emit log.
  * @returns {Function} connect/express middleware function
@@ -28,7 +28,7 @@ function logger(options) {
         format = options;
         options = {};
     } else {
-        format = options.format || 'default';
+        format = options.format || 'combined';
         delete options.format;
     }
     if (options.debug) {
