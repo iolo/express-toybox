@@ -21,18 +21,30 @@ var config = {
         //csrf: {},
         json: {},
         urlencoded: {},
-        multipart: {}
+        multipart: {},
+        assets: {
+            src: __dirname + '/assets',
+            dst: '/tmp/assets',
+            layers: [__dirname + '/assets1', __dirname + '/assets2'],
+            helpers: {
+                PI: Math.PI,
+                now: function () {
+                    return Date.now();
+                }
+            },
+            filters: {}
+        }
     },
     routes: {
         root: path.join(__dirname, '/to_be_root'),
         statics: {
-            '/asset': path.join(__dirname, '/to_be_asset'),
+            '/static': path.join(__dirname, '/to_be_static'),
             '/source': path.join(__dirname, '../libs')
         },
         errors: {
             404: {},
             500: {
-                mappings: {ENOENT: {status:404, message:'NOT FOUND'}}
+                mappings: {ENOENT: {status: 404, message: 'NOT FOUND'}}
             }
         }
     }
@@ -94,6 +106,7 @@ var app = express()
     .set('views', path.join(__dirname, 'views'))
     .set('view engine', 'ejs')
     .useCommonMiddlewares(config.middlewares)
+    .use(require('../assets')(config.middlewares.assets))
     .use(noisyMiddleware)
     .get('/add', function get(req, res) {
         return res.send(200, req.intParam('a') + req.intParam('b'));

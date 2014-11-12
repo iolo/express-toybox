@@ -1,0 +1,4 @@
+/* assets2/foo.css -- HIDDEN by assets1/foo.css */
+#assets2_foo_css {
+    display: block;
+}
