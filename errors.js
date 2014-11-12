@@ -5,6 +5,7 @@ var
     _ = require('lodash'),
     errors = require('node-toybox/errors'),
     CustomError = errors.CustomError,
+    /** @memberOf errors */
     StatusCode = { // see http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
         OK: 200,
         CREATED: 201,
@@ -25,6 +26,7 @@ var
         NOT_IMPLEMENTED: 501,
         UNKNOWN: 599
     },
+    /** @memberOf errors */
     StatusLine = {
         200: 'OK',
         201: 'Created',
@@ -52,6 +54,7 @@ var
  * @param {*} [cause]
  * @constructor
  * @abstract
+ * @memberOf errors
  */
 function HttpError(message, status, cause) {
     this.status = status || StatusCode.UNKNOWN;
@@ -68,6 +71,7 @@ HttpError.prototype.name = 'HttpError';
  * @param {*} [cause]
  * @constructor
  * @abstract
+ * @memberOf errors
  */
 function ClientError(message, status, cause) {
     ClientError.super_.call(this, message, status || StatusCode.CLIENT_ERROR, cause);
@@ -81,6 +85,7 @@ ClientError.prototype.name = 'ClientError';
  * @param {String} [message]
  * @param {*} [cause]
  * @constructor
+ * @memberOf errors
  */
 function BadRequest(message, cause) {
     BadRequest.super_.call(this, message, StatusCode.BAD_REQUEST, cause);
@@ -94,6 +99,7 @@ BadRequest.prototype.name = 'BadRequest';
  * @param {String} [message]
  * @param {*} [cause]
  * @constructor
+ * @memberOf errors
  */
 function Unauthorized(message, cause) {
     Unauthorized.super_.call(this, message, StatusCode.UNAUTHORIZED, cause);
@@ -107,6 +113,7 @@ Unauthorized.prototype.name = 'Unauthorized';
  * @param {String} [message]
  * @param {*} [cause]
  * @constructor
+ * @memberOf errors
  */
 function Forbidden(message, cause) {
     Forbidden.super_.call(this, message, StatusCode.FORBIDDEN, cause);
@@ -120,6 +127,7 @@ Forbidden.prototype.name = 'Forbidden';
  * @param {String} [message]
  * @param {*} [cause]
  * @constructor
+ * @memberOf errors
  */
 function NotFound(message, cause) {
     NotFound.super_.call(this, message, StatusCode.NOT_FOUND, cause);
@@ -135,6 +143,7 @@ NotFound.prototype.name = 'NotFound';
  * @param {*} [cause]
  * @constructor
  * @abstract
+ * @memberOf errors
  */
 function ServerError(message, status, cause) {
     ServerError.super_.call(this, message, status || StatusCode.SERVER_ERROR, cause);
@@ -148,6 +157,7 @@ ServerError.prototype.name = 'ServerError';
  * @param {String} [message]
  * @param {*} [cause]
  * @constructor
+ * @memberOf errors
  */
 function InternalServerError(message, cause) {
     InternalServerError.super_.call(this, message, StatusCode.INTERNAL_SERVER_ERROR, cause);
@@ -161,6 +171,7 @@ InternalServerError.prototype.name = 'InternalServerError';
  * @param {String} [message]
  * @param {*} [cause]
  * @constructor
+ * @memberOf errors
  */
 function NotImplemented(message, cause) {
     NotImplemented.super_.call(this, message, StatusCode.NOT_IMPLEMENTED, cause);
