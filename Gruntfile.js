@@ -9,7 +9,7 @@ module.exports = function (grunt) {
                 '-W097': true,//Use the function form of "use strict".
                 globals: {}
             },
-            all: ['libs/**/*.js']
+            all: ['*.js']
         },
         mochaTest: {
             all: {
