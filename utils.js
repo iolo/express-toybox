@@ -145,9 +145,11 @@ function echo(req, res) {
 
 /**
  * add some utility methods to http request.
+ *
+ * @param {*} [req]
  */
-function extendHttpRequest() {
-    var req = express.request || require('http').IncomingMessage.prototype;
+function extendHttpRequest(req) {
+    req = req || express.request;
 
     /**
      * get string param from http request.
@@ -155,7 +157,8 @@ function extendHttpRequest() {
      * @param {String} paramName
      * @param {String} [fallback]
      * @returns {String} param value
-     * @throws {*} no param acquired and no fallback provided
+     * @throws {errors.BadRequest} no string param acquired and no fallback provided
+     * @memberOf {express.request}
      */
     req.strParam = function (paramName, fallback) {
         var paramValue = this.param(paramName);
@@ -174,7 +177,8 @@ function extendHttpRequest() {
      * @param {String} paramName
      * @param {Number} [fallback]
      * @returns {Number} param value
-     * @throws {ParamRequired} no param acquired and no fallback provided
+     * @throws {errors.BadRequest} no integer param acquired and no fallback provided
+     * @memberOf {express.request}
      */
     req.intParam = function (paramName, fallback) {
         var paramValue = parseInt(this.param(paramName), 10);
@@ -193,11 +197,12 @@ function extendHttpRequest() {
      * @param {String} paramName
      * @param {Number} [fallback]
      * @returns {Number} param value
-     * @throws {ParamRequired} no param acquired and no fallback provided
+     * @throws {errors.BadRequest} no number param acquired and no fallback provided
+     * @memberOf {express.request}
      */
     req.numberParam = function (paramName, fallback) {
         var paramValue = parseFloat(this.param(paramName));
-        if (isNaN(paramValue)) {
+        if (!isNaN(paramValue)) {
             return paramValue;
         }
         if (fallback !== undefined) {
@@ -207,12 +212,13 @@ function extendHttpRequest() {
     };
 
     /**
-     * get bool param from http request.
+     * get boolean param from http request.
      *
      * @param {String} paramName
      * @returns {Boolean} [fallback]
      * @returns {Boolean} param value
-     * @throws {ParamRequired} no param acquired and no fallback provided
+     * @throws {errors.BadRequest} no boolean param acquired and no fallback provided
+     * @memberOf {express.request}
      */
     req.boolParam = function (paramName, fallback) {
         var paramValue = String(this.param(paramName)).toLowerCase();
@@ -226,6 +232,26 @@ function extendHttpRequest() {
             return fallback;
         }
         throw new errors.BadRequest('bool_param_required:' + paramName);
+    };
+
+    /**
+     * get date param from http request.
+     *
+     * @param {String} paramName
+     * @param {Date} [fallback]
+     * @returns {Date} param value
+     * @throws {errors.BadRequest} no date param acquired and no fallback provided
+     * @memberOf {express.request}
+     */
+    req.dateParam = function (paramName, fallback) {
+        var paramValue = Date.parse(this.param(paramName));
+        if (!isNaN(paramValue)) {
+            return new Date(paramValue);
+        }
+        if (fallback !== undefined) {
+            return fallback;
+        }
+        throw new errors.BadRequest('date_param_required:' + paramName);
     };
 
     /**
@@ -248,60 +274,217 @@ function extendHttpRequest() {
 
 /**
  * add some utility methods to http response.
+ *
+ * @param {*} [res]
  */
-function extendHttpResponse() {
-    var res = express.response || require('http').ServerResponse.prototype;
+function extendHttpResponse(res) {
+    res = res || express.response;
 
-    var EMIT_METHODS = ['send', 'json', 'jsonp', 'sendFile', 'redirect', 'render'];
-
-
-    EMIT_METHODS.forEach(function (emitMethod) {
-        // callback helpers
-        //
-        // ex.
-        // ```
-        // fs.readFile('foo.txt', res.sendCallbackFn(next));
-        // ```
-        res[emitMethod + 'CallbackFn'] = function (next) {
+    function callbackFnFn(verbFunc) {
+        return function (next, status) {
             var res = this;
             return function (err, result) {
-                return err ? next(err) : res[emitMethod].call(res, result);
+                if (err) {
+                    return next(err);
+                }
+                if (status) {
+                    return res.status(status);
+                }
+                return verbFunc.call(res, result);
             };
         };
+    }
 
-        // promised helpers
-        //
-        // ex.
-        // ```
-        // var FS = require('q-io/fs');
-        // res.sendLater(FS.readFile('foo.txt'), next);
-        // ```
-        res[emitMethod + 'Later'] = function (promise, next) {
+    function laterFnFn(verbFunc) {
+        return function (promise, next, status) {
             var res = this;
             return Q.when(promise).then(function (result) {
-                return res[emitMethod].call(res, result);
+                if (status) {
+                    res.status(status);
+                }
+                return verbFunc.call(res, result);
             }).fail(next).done();
         };
-    });
+    }
 
-    // ```
-    // fs.stat('foo.txt', res.renderCallbackFn('stat_view', next));
-    // ```
-    res.renderCallbackFn = function (view, next) {
+    //
+    // callback helpers
+    //
+
+    /**
+     * create generic node.js callback function to invoke 'express.response.send()'.
+     *
+     * ex.
+     * ```
+     * var fs = require('fs');
+     * app.get('/foo', function(req, res, next) {
+     *   fs.readFile('foo.txt', res.sendCallbackFn(next));
+     * });
+     * ```
+     * @param {function} next
+     * @param {number} [status]
+     * @returns {function(err, result)} generic node.js callback which send response.
+     * @method
+     * @memberOf {express.request}
+     */
+    res.sendCallbackFn = callbackFnFn(res.send);
+
+    /**
+     * create generic node.js callback function to invoke 'express.response.json()'.
+     *
+     * @param {function} next
+     * @param {number} [status]
+     * @returns {function(err, result)} generic node.js callback which send 'json' response.
+     * @method
+     * @memberOf {express.request}
+     */
+    res.jsonCallbackFn = callbackFnFn(res.json);
+
+    /**
+     * create generic node.js callback function to invoke 'express.response.jsonp()'.
+     *
+     * @param {function} next
+     * @param {number} [status]
+     * @returns {function(err, result)} generic node.js callback which send 'jsonp' response.
+     * @method
+     * @memberOf {express.request}
+     */
+    res.jsonpCallbackFn = callbackFnFn(res.jsonp);
+
+    /**
+     * create generic node.js callback function to invoke 'express.response.sendFile()'.
+     *
+     * @param {function} next
+     * @param {number} [status]
+     * @returns {function(err, result)} generic node.js callback which send 'sendFile' response.
+     * @method
+     * @memberOf {express.request}
+     */
+    res.sendFileCallbackFn = callbackFnFn(res.sendFile);
+
+    /**
+     * create generic node.js callback function to invoke 'express.response.redirect()'.
+     *
+     * @param {function} next
+     * @param {number} [status]
+     * @returns {function(err, result)} generic node.js callback which send 'redirect' response.
+     * @method
+     * @memberOf {express.request}
+     */
+    res.redirectCallbackFn = callbackFnFn(res.redirect);
+
+    /**
+     * ex.
+     * ```
+     * fs.stat('foo.txt', res.renderCallbackFn('stat_view', next));
+     * ```
+     *
+     * @param {string} view
+     * @param {function} next
+     * @param {number} [status]
+     * @returns {function(err, result)}
+     * @memberOf {express.response}
+     */
+    res.renderCallbackFn = function (view, next, status) {
         var res = this;
         return function (err, result) {
-            return err ? next(err) : res.render(view, result);
+            if (err) {
+                return next(err);
+            }
+            if (status) {
+                res.status(status);
+            }
+            return res.render(view, result);
         };
     };
 
-    // ex.
-    // ```
-    // var FS = require('q-io/fs');
-    // res.renderLater('stat_view', FS.stat('foo.txt'), next);
-    // ```
-    res.renderLater = function (view, promise, next) {
+    //
+    // promise helpers
+    //
+
+    /**
+     * promise version to invoke `express.response.send()`.
+     *
+     * ex.
+     * ```
+     * var FS = require('q-io/fs');
+     * app.get('/foo', function (req, res, next) {
+     *   res.sendLater(FS.readFile('foo.txt'), next);
+     * })
+     * ```
+     *
+     * @param {promise|*} promise of response.
+     * @param {function} next
+     * @param {number} [status]
+     * @method
+     * @memberOf {express.request}
+     */
+    res.sendLater = laterFnFn(res.send);
+
+    /**
+     * promise version of `express.response.json()`.
+     *
+     * @param {promise|*} promise of 'json' response.
+     * @param {function} next
+     * @param {number} [status]
+     * @method
+     * @memberOf {express.request}
+     */
+    res.jsonLater = laterFnFn(res.json);
+
+    /**
+     * promise version of `express.response.jsonp()`.
+     *
+     * @param {promise|*} promise of 'jsonp' response.
+     * @param {function} next
+     * @param {number} [status]
+     * @method
+     * @memberOf {express.request}
+     */
+    res.jsonpLater = laterFnFn(res.jsonp);
+
+    /**
+     * promise version of `express.response.sendFile()`.
+     *
+     * @param {promise|*} promise of 'sendFile' response.
+     * @param {function} next
+     * @param {number} [status]
+     * @method
+     * @memberOf {express.request}
+     */
+    res.sendFileLater = laterFnFn(res.sendFile);
+
+    /**
+     * promise version of `express.response.redirect()`.
+     *
+     * @param {promise|*} promise of 'redirect' response.
+     * @param {function} next
+     * @param {number} [status]
+     * @method
+     * @memberOf {express.request}
+     */
+    res.redirectLater = laterFnFn(res.redirect);
+
+    /**
+     *
+     * ex.
+     * ```
+     * var FS = require('q-io/fs');
+     * res.renderLater('stat_view', FS.stat('foo.txt'), next);
+     * ```
+     *
+     * @param {string} view
+     * @param {promise|*} promise of 'render' model.
+     * @param {function} next
+     * @param {number} [status]
+     * @memberOf {express.response}
+     */
+    res.renderLater = function (view, promise, next, status) {
         var res = this;
         return Q.when(promise).then(function (result) {
+            if (status) {
+                res.status(status);
+            }
             return res.render(view, result);
         }).fail(next).done();
     };
