@@ -41,8 +41,5 @@
         "superagent": "^0.18.1",
         "supertest": "^0.13.0"
     },
-    "directories": {
-        "lib": "./libs"
-    },
     "main": "./index"
 }

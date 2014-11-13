@@ -19,9 +19,10 @@ module.exports = function (grunt) {
         },
         doxx: {
             lib: {
-                src: 'libs',
+                src: '.',
                 target: 'build/doxx',
                 options: {
+                    ignore: ['node_modules', 'build']
                 }
             }
         }
