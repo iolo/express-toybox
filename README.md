@@ -29,7 +29,7 @@ $ node example/app.js
 $ open http://localhost:3333
 ```
 
-### require it with/wihtout express
+### require it with/without express
 
 ```javascript
 var express = require('express-toybox')(require('express'));
@@ -77,43 +77,43 @@ expressToybox.utils.collectQueryParams(req);
 * pagination()
 * renderViewOrRedirectToNext()
 * echo()
-* extendHttpRequest() - additional methods for express.request(http.IncomingMessage)
+* extendHttpRequest() - additional methods for express.request
     - req.strParam(name, fallback)
     - req.intParam(name, fallback)
     - req.numberParam(name, fallback)
     - req.boolParam(name, fallback)
+    - req.dateParam(name, fallback)
     - req.collectParams(names)
     - ...
-* extendHttpResponse() - additional methods for express.response(http.ServerResponse)
-    - res.sendCallbackFn(next)
+* extendHttpResponse() - additional methods for express.response
+    - res.sendCallbackFn(next, status)
         ```javascript
         var fs = require('fs');
         app.get('/foo', function (req, res, next) {
                 fs.readFile('file.txt', res.sendCallbackFn(next));
         });
         ```
-    - res.jsonCallbackFn(next)
-    - res.jsonpCallbackFn(next)
-    - res.sendFileCallbackFn(next)
-    - res.redirectCallbackFn(next)
-    - res.renderCallbackFn(view, next)
-    - res.sendLater(promise, next)
+    - res.jsonCallbackFn(next, status)
+    - res.jsonpCallbackFn(next, status)
+    - res.sendFileCallbackFn(next, status)
+    - res.redirectCallbackFn(next, status)
+    - res.renderCallbackFn(view, next, status)
+    - res.sendLater(promise, next, status)
         ```javascript
         var FS = require('q-io/fs');
         app.get('/bar', function (req, res, next) {
                 res.sendLater(FS.readFile('file.txt'), next);
         });
         ```
-    - res.jsonLater(promise, next)
-    - res.jsonpLater(promise, next)
-    - res.sendFileLater(promise, next)
-    - res.redirectLater(promise, next)
-    - res.renderLater(view, promise, next)
+    - res.jsonLater(promise, next, status)
+    - res.jsonpLater(promise, next, status)
+    - res.sendFileLater(promise, next, status)
+    - res.redirectLater(promise, next, status)
+    - res.renderLater(view, promise, next, status)
     - ...
 * ...
 
-<a id="cors-middleware"></a>
-### cors
+### cors middleware
 
 * usage
 ```
@@ -127,8 +127,7 @@ TBW: ...
 }
 ```
 
-<a id="logger-middleware"></a>
-### logger
+### logger middleware
 
 * usage
 
@@ -155,8 +154,7 @@ express()...use(express.toybox.logger(config))...
 ```
 * ...
 
-<a id="session-middleware"></a>
-### session
+### session middleware
 
 * usage
 ```
@@ -176,8 +174,16 @@ express()...use(express.toybox.session(config))...
 ```
 * ...
 
-<a id="resource-middleware"></a>
-### resource
+### assets middleware
+
+* usage
+```
+express()...use(express.toybox.assets(config))...
+```
+
+* ...
+
+### resource routes
 
 * usage
 ```
@@ -201,8 +207,7 @@ useResource('/posts/:id', {
 });
 ```
 
-<a id="error404-middleware"></a>
-### error404
+### error404 error handler
 
 send custom http 404 error with json/html/text by accept header in request.
 
@@ -224,8 +229,7 @@ express()...use(express.toybox.error404(config))...
 
 * example: see [test case](tests/error404_test.js)
 
-<a id="errorr500-middleware"></a>
-### error500
+### error500 error handler
 
 send custom http error with json/html/text by accept header in request.
 
@@ -249,7 +253,6 @@ express()...use(express.toybox.error500(config))...
 
 * see [test case](tests/error500_test.js)
 
-<a id="declarative-middlewares"></a>
 ## declarative middlewares
 
 * usage
@@ -279,6 +282,7 @@ express.toybox.common.configureMiddlewares(app, config);
     json: {json-config...},
     text: {text-config...},
     raw: {raw-config...},
+    assets: {assets-config...},
     ...
 }
 ```
@@ -378,7 +382,10 @@ TBW: ...
 }
 ```
 
-<a id="declarative-routes"></a>
+### assets
+
+* configure [assets](#assets-middleware) middleware(custom).
+
 ## declarative routes
 
 * usage
@@ -421,7 +428,7 @@ express.toybox.common.configureRoutes(app, config);
 
 ### resources
 
-* configure multiple [resource](#resource-middleware) middleware(custom).
+* configure multiple [resource](#resource-routes) routes(custom).
 ```
 {
     'url-path': 'resource-module-name'
@@ -441,10 +448,10 @@ express.toybox.common.configureRoutes(app, config);
 
 #### error404
 
-* configure [error404](#error4040-middleware) middleware(custom).
+* configure [error404](#error404-error-handler) error handler(custom).
 
 #### error500
 
-* configure [error500](#error500-middleware) middleware(custom) and [errorhandler](https://github.com/expressjs/errorhandler) middleware(contrib).
+* configure [error500](#error500-error-handler) error handler(custom) and [errorhandler](https://github.com/expressjs/errorhandler) middleware(contrib).
 
 *may the source be with you...*
