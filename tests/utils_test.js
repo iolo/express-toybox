@@ -301,7 +301,7 @@ describe('utils', function () {
 
         it('sendFileCallbackFn', function (done) {
             var app = express().get('/', function (req, res, next) {
-                asyncFunc('foo.txt', res.sendFileCallbackFn(next));
+                asyncFunc(__dirname + '/foo.txt', res.sendFileCallbackFn(next));
             });
             supertest(app)
                 .get('/')
@@ -352,7 +352,7 @@ describe('utils', function () {
 
         it('sendFileLater', function (done) {
             var app = express().get('/', function (req, res, next) {
-                res.sendFileLater(promiseFunc('foo.txt'));
+                res.sendFileLater(promiseFunc(__dirname + '/foo.txt'));
             });
             supertest(app)
                 .get('/')
