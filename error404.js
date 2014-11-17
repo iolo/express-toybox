@@ -36,7 +36,7 @@ function error404(options) {
             status: options.status,
             code: options.code,
             message: options.message,
-            cause: req
+            cause: {path: req.path, url: req.url, originalUrl: req.originalUrl, baseUrl: req.baseUrl, query: req.query}
         };
 
         res.status(error.status);
