@@ -174,15 +174,6 @@ express()...use(express.toybox.session(config))...
 ```
 * ...
 
-### assets middleware
-
-* usage
-```
-express()...use(express.toybox.assets(config))...
-```
-
-* ...
-
 ### resource routes
 
 * usage
@@ -282,7 +273,6 @@ express.toybox.common.configureMiddlewares(app, config);
     json: {json-config...},
     text: {text-config...},
     raw: {raw-config...},
-    assets: {assets-config...},
     ...
 }
 ```
@@ -381,10 +371,6 @@ TBW: ...
 TBW: ...
 }
 ```
-
-### assets
-
-* configure [assets](#assets-middleware) middleware(custom).
 
 ## declarative routes
 
