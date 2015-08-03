@@ -56,37 +56,37 @@ function noisyMiddleware(req, res, next) {
 
 var users = {
     index: function (req, res) {
-        return res.send('users.index:' + req.param('id'));
+        return res.send('users.index:[' + req.param('id') + ']');
     },
     create: function (req, res) {
-        return res.send('users.create:' + req.param('id'));
+        return res.send('users.create:[' + req.param('id') + ']');
     },
     show: function (req, res) {
-        return res.send('users.show:' + req.param('id'));
+        return res.send('users.show:[' + req.param('id') + ']');
     },
     update: function (req, res) {
-        return res.send('users.update:' + req.param('id'));
+        return res.send('users.update:[' + req.param('id') + ']');
     },
     destroy: function (req, res) {
-        return res.send('users.destroy:' + req.param('id'));
+        return res.send('users.destroy:[' + req.param('id') + ']');
     }
 };
 
 var userPosts = {
     index: function (req, res) {
-        return res.send('users:' + req.param('uid') + '/posts.index:' + req.param('id'));
+        return res.send('users:[' + req.param('uid') + ']/posts.index:[' + req.param('id') + ']');
     },
     create: function (req, res) {
-        return res.send('users:' + req.param('uid') + '/posts.create:' + req.param('id'));
+        return res.send('users:[' + req.param('uid') + ']/posts.create:[' + req.param('id') + ']');
     },
     show: function (req, res) {
-        return res.send('users:' + req.param('uid') + '/posts.show:' + req.param('id'));
+        return res.send('users:[' + req.param('uid') + ']/posts.show:[' + req.param('id') + ']');
     },
     update: function (req, res) {
-        return res.send('users:' + req.param('uid') + '/posts.update:' + req.param('id'));
+        return res.send('users:[' + req.param('uid') + ']/posts.update:[' + req.param('id') + ']');
     },
     destroy: function (req, res) {
-        return res.send('users:' + req.param('uid') + '/posts.destroy:' + req.param('id'));
+        return res.send('users:[' + req.param('uid') + ']/posts.destroy:[' + req.param('id') + ']');
     }
 };
 

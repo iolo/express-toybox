@@ -12,7 +12,7 @@ var
         status: 404,
         code: 8404,
         message: 'Not Found',
-        template: '',
+        template: undefined,
         view: 'errors/404'
     };
 
@@ -23,12 +23,17 @@ var
  * @param {Number} [options.status=404]
  * @param {Number} [options.code=8404]
  * @param {String} [options.message='Not Found']
- * @param {String} [options.template] lodash(underscore) micro template for html 404 error page.
+ * @param {String|Function} [options.template] lodash(underscore) micro template for html 404 error page.
  * @param {String} [options.view='errors/404'] express view path of html 404 error page.
  * @returns {Function} express request handler
  */
 function error404(options) {
     options = _.merge({}, DEF_CONFIG, options);
+
+    // pre-compile underscore template if available
+    if (typeof options.template === 'string' && options.template.length > 0) {
+        options.template = _.template(options.template);
+    }
 
     return function (req, res, next) {
 
@@ -45,9 +50,9 @@ function error404(options) {
             case 'json':
                 return res.json(error);
             case 'html':
-                if (options.template) {
+                if (typeof options.template === 'function') {
                     res.type('html');
-                    return res.send(_.template(options.template, {error: error}));
+                    return res.send(options.template({error: error}));
                 }
                 return res.render(options.view, {error: error});
         }

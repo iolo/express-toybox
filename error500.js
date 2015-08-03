@@ -14,7 +14,7 @@ var
         code: 8500,
         mappings: {}, // {ENOENT: {status:404, message:'NOT FOUND'}}
         stack: false,
-        template: '',
+        template: undefined,
         view: 'errors/500'
     };
 
@@ -26,12 +26,17 @@ var
  * @param {Number} [options.code=8500]
  * @param {*} [options.mappings={}] map err.name/err.code to error response.
  * @param {Boolean} [options.stack=false]
- * @param {String} [options.template] lodash(underscore) micro template for html error page.
+ * @param {String|Function} [options.template] lodash(underscore) micro template for html error page.
  * @param {String} [options.view='errors/500'] express view path of html error page.
  * @returns {Function} express error handler
  */
 function error500(options) {
     options = _.merge({}, DEF_CONFIG, options);
+
+    // pre-compile underscore template if available
+    if (typeof options.template === 'string' && options.template.length > 0) {
+        options.template = _.template(options.template);
+    }
 
     return function (err, req, res, next) {
         console.error('uncaught express error:', err);
@@ -54,9 +59,9 @@ function error500(options) {
             case 'json':
                 return res.json(error);
             case 'html':
-                if (options.template) {
+                if (typeof options.template === 'function') {
                     res.type('html');
-                    return res.send(_.template(options.template, {error: error}));
+                    return res.send(options.template({error: error}));
                 }
                 return res.render(options.view, {error: error});
         }

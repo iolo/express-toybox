@@ -1,3 +1,4 @@
+/* global describe,it,before,beforeEach,after,afterEach */
 'use strict';
 
 var
@@ -59,25 +60,29 @@ describe('utils', function () {
                 assert(req.intParam('int', '***whatever***') === query.int);
                 assert(req.intParam('**whatever***', 'world') === 'world');
 
-                assert(typeof req.intParam('num') === 'number');
-                assert(req.intParam('num') === parseInt(query.num, 10));
-
                 try {
-                    req.numberParam('str');
+                    req.intParam('num');
                     assert(false);
                 } catch (e) {
                     assert(e.status, 400);
                 }
 
                 try {
-                    req.numberParam('bool');
+                    req.intParam('str');
                     assert(false);
                 } catch (e) {
                     assert(e.status, 400);
                 }
 
                 try {
-                    req.numberParam('date');
+                    req.intParam('bool');
+                    assert(false);
+                } catch (e) {
+                    assert(e.status, 400);
+                }
+
+                try {
+                    req.intParam('date');
                     assert(false);
                 } catch (e) {
                     assert(e.status, 400);

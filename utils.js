@@ -24,7 +24,7 @@ function collectQueryParams(req, paramNames) {
         params: {}
     };
     paramNames.forEach(function (paramName) {
-        var paramValue = req.param(paramName);
+        var paramValue = req.anyParam(paramName);
         if (paramValue) {
             paramValue = paramValue.trim();
             if (paramValue && paramValue !== '*') {
@@ -37,7 +37,7 @@ function collectQueryParams(req, paramNames) {
             result.params[paramName] = paramValue;
         }
     });
-    var fields = req.param('fields');
+    var fields = req.anyParam('fields');
     if (fields) {
         result.fields = {};
         fields.split(',').forEach(function (field) {
@@ -57,7 +57,7 @@ function collectQueryParams(req, paramNames) {
             }
         });
     }
-    var sort = req.param('sort');
+    var sort = req.anyParam('sort');
     if (sort) {
         result.options.sort = {};
         sort.split(',').forEach(function (field) {
@@ -78,12 +78,12 @@ function collectQueryParams(req, paramNames) {
         });
         result.params.sort = sort;
     }
-    var skip = req.param('skip') || req.param('offset');
+    var skip = req.anyParam('skip') || req.anyParam('offset');
     if (skip) {
         result.options.skip = parseInt(skip, 10);
         result.params.skip = skip;
     }
-    var limit = req.param('limit');
+    var limit = req.anyParam('limit');
     if (limit) {
         result.options.limit = parseInt(limit, 10);
         result.params.limit = limit;
@@ -120,7 +120,7 @@ function pagination(offset, limit, count, range) {
  * @returns {*}
  */
 function renderViewOrRedirectToNext(req, res, view, next, vm) {
-    next = req.param('next') || next;
+    next = req.strParam('next', next);
     if (view) {
         return res.render(view, _.extend({next: next}, vm));
     }
@@ -152,6 +152,20 @@ function extendHttpRequest(req) {
     req = req || express.request;
 
     /**
+     * get param value from path-variable or query or body or headers.
+     * @param {string} paramName
+     * @param {*} [fallback]
+     * @returns {*}
+     */
+    req.anyParam = function (paramName, fallback) {
+        return (this.params && this.params[paramName]) || // path-variable
+            (this.query && this.query[paramName]) ||
+            (this.body && this.body[paramName]) ||
+            (this.get && this.get(paramName)) || // header
+            fallback;
+    };
+
+    /**
      * get string param from http request.
      *
      * @param {String} paramName
@@ -161,7 +175,7 @@ function extendHttpRequest(req) {
      * @memberOf {express.request}
      */
     req.strParam = function (paramName, fallback) {
-        var paramValue = this.param(paramName);
+        var paramValue = this.anyParam(paramName);
         if (paramValue !== undefined) {
             return paramValue;
         }
@@ -181,8 +195,8 @@ function extendHttpRequest(req) {
      * @memberOf {express.request}
      */
     req.intParam = function (paramName, fallback) {
-        var paramValue = parseInt(this.param(paramName), 10);
-        if (!isNaN(paramValue)) {
+        var paramValue = utils.toInt(this.anyParam(paramName), fallback);
+        if (paramValue !== undefined) {
             return paramValue;
         }
         if (fallback !== undefined) {
@@ -201,8 +215,8 @@ function extendHttpRequest(req) {
      * @memberOf {express.request}
      */
     req.numberParam = function (paramName, fallback) {
-        var paramValue = parseFloat(this.param(paramName));
-        if (!isNaN(paramValue)) {
+        var paramValue = utils.toNumber(this.anyParam(paramName));
+        if (paramValue !== undefined) {
             return paramValue;
         }
         if (fallback !== undefined) {
@@ -221,12 +235,9 @@ function extendHttpRequest(req) {
      * @memberOf {express.request}
      */
     req.boolParam = function (paramName, fallback) {
-        var paramValue = String(this.param(paramName)).toLowerCase();
-        if (/^(1|y|yes|on|t|true)$/.test(paramValue)) {
-            return true;
-        }
-        if (/^(0|n|no|off|f|false)$/.test(paramValue)) {
-            return false;
+        var paramValue = utils.toBoolean(this.anyParam(paramName));
+        if (paramValue !== undefined) {
+            return paramValue;
         }
         if (fallback !== undefined) {
             return fallback;
@@ -244,7 +255,7 @@ function extendHttpRequest(req) {
      * @memberOf {express.request}
      */
     req.dateParam = function (paramName, fallback) {
-        var paramValue = Date.parse(this.param(paramName));
+        var paramValue = Date.parse(this.anyParam(paramName));
         if (!isNaN(paramValue)) {
             return new Date(paramValue);
         }
@@ -263,7 +274,7 @@ function extendHttpRequest(req) {
     req.collectParams = function (paramNames) {
         var self = this;
         return paramNames.reduce(function (params, paramName) {
-            var paramValue = self.param(paramName);
+            var paramValue = self.strParam(paramName);
             if (paramValue) {
                 params[paramName] = paramValue.trim();
             }

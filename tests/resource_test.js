@@ -1,3 +1,4 @@
+/* global describe,it,before,beforeEach,after,afterEach */
 'use strict';
 
 var
